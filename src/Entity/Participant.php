@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\ParticipantRepository;
-use Doctrine\ORM\Mapping as ORM;
-use phpDocumentor\Reflection\Types\Boolean;
+    use App\Repository\ParticipantRepository;
+    use Doctrine\ORM\Mapping as ORM;
+    use phpDocumentor\Reflection\Types\Boolean;
 
 #[ORM\Entity(repositoryClass: ParticipantRepository::class)]
 class Participant
