@@ -23,10 +23,10 @@ class Location
     #[ORM\Column(length: 150, nullable: true)]
     private ?string $street = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 11, nullable: true)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 8, nullable: true)]
     private ?string $latitude = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 11, nullable: true)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 11, scale: 8, nullable: true)]
     private ?string $longitude = null;
 
     public function getId(): ?int
