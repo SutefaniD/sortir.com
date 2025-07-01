@@ -1,0 +1,15 @@
+<div id="profileDrawer" class="profile-drawer">
+    <h2>Mon profil</h2>
+    <img src="{{ asset('assets/images/close.svg') }}" alt="" id="closeProfile">
+    <ul>
+        <li>Last name : {{ app.user.lastName }}</li>
+        <li>First name : {{ app.user.firstName }}</li>
+        <li>Phone : {{ app.user.phone }}</li>
+        <li>Email : {{ app.user.email }}</li>
+    </ul>
+
+    <a href="{{ path('app_logout') }}" class="drawer-button">Se deconnecter</a>
+    <a href="{{ path('participant_update_profile') }}" class="drawer-button">Modifier mon profil</a>
+    <a href="" class="drawer-button">Modifier mon mot de passe</a>
+    <a href="{{ path('participant_delete') }}" class="drawer-button danger">Supprimer mon compte</a>
+</div>

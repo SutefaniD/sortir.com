@@ -9,7 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CreateParticipantForm extends AbstractType
+class ParticipantForm extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -17,11 +17,18 @@ class CreateParticipantForm extends AbstractType
             ->add('lastName')
             ->add('firstName')
             ->add('phone')
-            ->add('email')
-            ->add('password', PasswordType::class)
-//            ->add('administrator')
-//            ->add('active')
-            ->add('submit', SubmitType::class)
+            ->add('email');
+
+            if ($options['include_password']) {
+                $builder
+                    ->add('password', PasswordType::class)
+                    -> add('confirmPassword', PasswordType::class, [
+                        'mapped' => false,
+                        'required' => true,
+                    ]);
+            }
+
+            $builder->add('submit', SubmitType::class)
         ;
     }
 
@@ -29,6 +36,7 @@ class CreateParticipantForm extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Participant::class,
+            'include_password' => true,
         ]);
     }
 }

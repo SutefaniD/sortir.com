@@ -3,13 +3,16 @@
 namespace App\Controller;
 
 use App\Entity\Participant;
-use App\Form\CreateParticipantForm;
+use App\Form\ParticipantForm;
+use App\Repository\ParticipantRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 #[Route('/participant', name: 'participant_')]
 final class ParticipantController extends AbstractController
@@ -23,26 +26,95 @@ final class ParticipantController extends AbstractController
     public function create(EntityManagerInterface $entityManager, Request $request): Response
     {
         $participant = new Participant();
-        $form = $this->createForm(CreateParticipantForm::class, $participant);
+        $form = $this->createForm(ParticipantForm::class, $participant, ['include_password' => true]);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $plainPassword = $form->get('password')->getData();
+            $confirmPassword = $form->get('confirmPassword')->getData();
 
-            $hashedPassword = $this->passwordHasher->hashPassword($participant, $plainPassword);
+            if ($plainPassword !== $confirmPassword) {
+                $form->get('confirmPassword')->addError(new FormError("Les mots de passe ne correspondent pas."));
+            } else {
+                $hashedPassword = $this->passwordHasher->hashPassword($participant, $plainPassword);
 
-            $participant->setPassword($hashedPassword);
+                $participant->setPassword($hashedPassword);
 
-            $participant->setAdministrator(false);
-            $participant->setActive(true);
+                $participant->setAdministrator(false);
+                $participant->setActive(true);
 
-            $entityManager->persist($participant);
-            $entityManager->flush();
+                $entityManager->persist($participant);
+                $entityManager->flush();
 
+                return $this->redirectToRoute('main_home');
+            }
+        }
+
+        return $this->render('participant/create.html.twig', ['createParticipantForm' => $form]);
+    }
+
+    #[Route('/update/profile', name: 'update_profile')]
+    public function update_profile(EntityManagerInterface $entityManager, Request $request): Response {
+        $participant = $this->getUser();
+
+        if (!$participant instanceof Participant) {
             return $this->redirectToRoute('main_home');
         }
 
-        return $this->render('participant/create.html.twig', [ 'createParticipantForm' => $form]);
+        $form = $this->createForm(ParticipantForm::class, $participant, ['include_password' => false]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+//            $plainPassword = $form->get('password')->getData();
+//            $confirmPassword = $form->get('confirmPassword')->getData();
+
+//            if ($plainPassword !== $confirmPassword) {
+//                $form->get('confirmPassword')->addError(new FormError("Les mots de passe ne correspondent pas."));
+//            } else {
+//                $hashedPassword = $this->passwordHasher->hashPassword($participant, $plainPassword);
+//
+//                $participant->setPassword($hashedPassword);
+//
+//                $participant->setAdministrator(false);
+//                $participant->setActive(true);
+
+                $entityManager->persist($participant);
+                $entityManager->flush();
+
+                return $this->redirectToRoute('main_home');
+//            }
+        }
+
+        return $this->render('participant/update.html.twig', ['createParticipantForm' => $form]);
+    }
+
+    #[Route('/delete', name: 'delete', methods: ['GET'])]
+    public function delete(EntityManagerInterface $entityManager, ParticipantRepository $participantRepository, TokenStorageInterface $tokenStorage, Request $request): Response {
+        $user = $this->getUser();
+
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $participant = $participantRepository->find($user->getId());
+
+        if (!$participant) {
+            return $this->redirectToRoute('main_home');
+        }
+
+        try {
+            $entityManager->remove($participant);
+            $entityManager->flush();
+
+            $tokenStorage->setToken(null);
+            $request->getSession()->invalidate();
+
+            return $this->redirectToRoute('app_login');
+        } catch (Exception $exception) {
+
+        }
+
+        return $this->redirectToRoute('main_home');
     }
 }
