@@ -2,9 +2,11 @@
 
 namespace App\Entity;
 
+use App\Enum\StatusName;
 use App\Repository\StatusRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: StatusRepository::class)]
@@ -15,8 +17,8 @@ class Status
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 150)]
-    private ?string $name = null;
+    #[ORM\Column(type: Types::STRING, enumType: StatusName::class)]
+    private StatusName $name;
 
     /**
      * @var Collection<int, Outing>
@@ -34,17 +36,17 @@ class Status
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName(): StatusName
     {
         return $this->name;
     }
 
-    public function setName(string $name): static
+    public function setName(StatusName $name): void
     {
         $this->name = $name;
-
-        return $this;
     }
+
+
 
     /**
      * @return Collection<int, Outing>

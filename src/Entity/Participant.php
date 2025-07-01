@@ -23,7 +23,7 @@ class Participant
     private ?string $firstName = null;
 
     #[ORM\Column]
-    private ?int $phone = null;
+    private ?string $phone = null;
 
     #[ORM\Column(length: 150)]
     private ?string $email = null;
@@ -85,12 +85,12 @@ class Participant
         return $this;
     }
 
-    public function getPhone(): ?int
+    public function getPhone(): ?string
     {
         return $this->phone;
     }
 
-    public function setPhone(int $phone): static
+    public function setPhone(string $phone): static
     {
         $this->phone = $phone;
 
