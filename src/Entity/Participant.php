@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ParticipantRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use phpDocumentor\Reflection\Types\Boolean;
 
@@ -34,6 +36,17 @@ class Participant
 
     #[ORM\Column(type: 'boolean')]
     private ?bool $active = false;
+
+    /**
+     * @var Collection<int, Outing>
+     */
+    #[ORM\ManyToMany(targetEntity: Outing::class, mappedBy: 'participant')]
+    private Collection $outings;
+
+    public function __construct()
+    {
+        $this->outings = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -116,5 +129,32 @@ class Participant
     public function setActive(?bool $active): void
     {
         $this->active = $active;
+    }
+
+    /**
+     * @return Collection<int, Outing>
+     */
+    public function getOutings(): Collection
+    {
+        return $this->outings;
+    }
+
+    public function addOuting(Outing $outing): static
+    {
+        if (!$this->outings->contains($outing)) {
+            $this->outings->add($outing);
+            $outing->addParticipant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOuting(Outing $outing): static
+    {
+        if ($this->outings->removeElement($outing)) {
+            $outing->removeParticipant($this);
+        }
+
+        return $this;
     }
 }
