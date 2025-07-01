@@ -2,17 +2,19 @@
     <nav>
         <div id="nav-title">
             <a href="{{ path('main_home') }}">Sortir.com</a>
+            {% if app.user %}
+                <p class="nav-button">Hello {{ app.user.firstName }}</p>
+            {% endif %}
         </div>
 
         <div class="button-list">
-            <p class="nav-button"><a href="{{ path('main_home') }}">Accueil</a></p>
-            <p class="nav-button"><a href="{{ path('participant_create') }}">Register</a></p>
-{#            {% if app.user %}#}
-{#                <p class="nav-button"><a href="{{ path('app_logout') }}">Log out</a></p>#}
-{#                <p class="nav-button">Hello {{ app.user.username }}</p>#}
-{#            {% else %}#}
-{#                <p class="nav-button"><a href="{{ path('app_login') }}">Log in</a></p>#}
-{#            {% endif %}#}
+            {% if app.user %}
+                <p class="nav-button"><a href="{{ path('main_home') }}">Accueil</a></p>
+                <p class="nav-button"><a href="{{ path('app_logout') }}">Log out</a></p>
+            {% else %}
+                <p class="nav-button"><a href="{{ path('participant_create') }}">Register</a></p>
+                <p class="nav-button"><a href="{{ path('app_login') }}">Log in</a></p>
+            {% endif %}
         </div>
     </nav>
 </header>

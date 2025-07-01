@@ -60,6 +60,14 @@ nav {
     background-color: #e2e6ea;
 }
 
+/************************************************** Main **************************************************/
+.container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 /************************************************** Footer **************************************************/
 footer {
     background-color: #f8f9fa;
