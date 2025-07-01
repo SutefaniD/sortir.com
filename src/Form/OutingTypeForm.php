@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Form;
+use App\Form\LocationForm;
 use App\Entity\Location;
 use App\Entity\Site;
 use App\Entity\Status;
@@ -36,19 +37,28 @@ class OutingTypeForm extends AbstractType
             ->add('duration', IntegerType::class, [
                 "label" => "Durée : "
             ])
-            ->add('outingDetails', TextareaType::class
-            )
+            ->add('outingDetails', TextareaType::class, [
+                "label" => "Déscription et info : "
+            ])
+
             ->add('site', EntityType::class, [
                 'class' => Site::class,
                 'choice_label' => 'name',
+                'label' => 'Site :'
             ])
-            ->add('location', EntityType::class, [
+
+            ->add('location', LocationForm::class, [
+                'label' => false // formulaire imbriqué, labels gérés à l’intérieur
+            ]);
+            /*
+             * ->add('location', EntityType::class, [
                 'class' => Location::class,
-                'choice_label' => 'name',
+                'choice_label' => 'name', // La propriété de Location
+                'label' => 'Lieu enregistré :'
             ])
             ->add('status', EntityType::class, [
                 'class' => Status::class,
-                'choice_label' => 'label',
+                'choice_label' => 'Etat',
             ])
             ->add('participants', EntityType::class, [
                 'class' => Participant::class,
@@ -56,7 +66,9 @@ class OutingTypeForm extends AbstractType
                 'multiple' => true,
                 'expanded' => true,
                 'required' => false,
-            ]);
+            ])*/
+
+
     }
 
     public function configureOptions(OptionsResolver $resolver): void
