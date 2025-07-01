@@ -5,39 +5,29 @@ namespace App\DataFixtures;
 use App\Entity\Participant;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Faker\Factory;
 
 class ParticipantFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        $participant = new Participant();
-        $participant->setLastName('Smith');
-        $participant->setFirstName('John');
-        $participant->setPhone("0102030405");
-        $participant->setEmail("j.smith@mail.fr");
-        $participant->setAdministrator(0);
-        $participant->setActive(1);
+        $faker = Factory::create();
 
-        $participant2 = new Participant();
-        $participant2->setLastName('Doe');
-        $participant2->setFirstName('Jane');
-        $participant2->setPhone("0502030401");
-        $participant2->setEmail("jane.doe@mail.fr");
-        $participant2->setAdministrator(0);
-        $participant2->setActive(1);
+        for ($i = 0; $i < 20; $i++) {
+            $participant = new Participant();
+            $participant->setFirstName($faker->firstName());
+            $participant->setLastName($faker->lastName());
+            $participant->setPhone($faker->phoneNumber());
+            $participant->setEmail($faker->unique()->safeEmail());
 
-        $participant3 = new Participant();
-        $participant3->setLastName('Smith');
-        $participant3->setFirstName('Will');
-        $participant3->setPhone("0234567865");
-        $participant3->setEmail("wsmith@mail.fr");
-        $participant3->setAdministrator(1);
-        $participant3->setActive(1);
+            $password = password_hash('password', PASSWORD_BCRYPT);
+            $participant->setPassword($password);
 
+            $participant->setAdministrator($faker->boolean(10)); // 10% d'admin
+            $participant->setActive($faker->boolean(80)); // 80% actifs
 
-        $manager->persist($participant);
-        $manager->persist($participant2);
-        $manager->persist($participant3);
+            $manager->persist($participant);
+        }
 
         $manager->flush();
     }
