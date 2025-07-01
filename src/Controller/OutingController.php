@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Outing;
+use App\Form\OutingTypeForm;
 use App\Repository\ParticipantRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,7 +28,7 @@ final class OutingController extends AbstractController
             $outing->setOrganizer($organizer);
         }
 
-        $form = $this->createForm(OutingType::class, $outing);
+        $form = $this->createForm(OutingTypeForm::class, $outing);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -39,8 +40,9 @@ final class OutingController extends AbstractController
         }
 
         return $this->render('outing/create.html.twig', [
-            'form' => $form->createView(),
+            'form' => $form,
         ]);
+
     }
 
 
