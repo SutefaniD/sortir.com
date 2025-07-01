@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\ParticipantRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
-use phpDocumentor\Reflection\Types\Boolean;
+    use App\Repository\ParticipantRepository;
+    use Doctrine\Common\Collections\ArrayCollection;
+    use Doctrine\Common\Collections\Collection;
+    use Doctrine\ORM\Mapping as ORM;
+    use phpDocumentor\Reflection\Types\Boolean;
 
 #[ORM\Entity(repositoryClass: ParticipantRepository::class)]
 class Participant
@@ -37,15 +37,23 @@ class Participant
     #[ORM\Column(type: 'boolean')]
     private ?bool $active = false;
 
+
     /**
      * @var Collection<int, Outing>
      */
-    #[ORM\ManyToMany(targetEntity: Outing::class, mappedBy: 'participant')]
-    private Collection $outings;
+    #[ORM\ManyToMany(targetEntity: Outing::class, mappedBy: 'participants')]
+    private Collection $registeredOutings;
+
+    /**
+     * @var Collection<int, Outing>
+     */
+    #[ORM\OneToMany(targetEntity: Outing::class, mappedBy: 'organizer')]
+    private Collection $organizedOutings;
 
     public function __construct()
     {
-        $this->outings = new ArrayCollection();
+        $this->registeredOutings = new ArrayCollection();
+        $this->organizedOutings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -131,28 +139,59 @@ class Participant
         $this->active = $active;
     }
 
+
     /**
      * @return Collection<int, Outing>
      */
-    public function getOutings(): Collection
+    public function getRegisteredOutings(): Collection
     {
-        return $this->outings;
+        return $this->registeredOutings;
     }
 
-    public function addOuting(Outing $outing): static
+    public function addRegisteredOuting(Outing $registeredOuting): static
     {
-        if (!$this->outings->contains($outing)) {
-            $this->outings->add($outing);
-            $outing->addParticipant($this);
+        if (!$this->registeredOutings->contains($registeredOuting)) {
+            $this->registeredOutings->add($registeredOuting);
+            $registeredOuting->addParticipant($this);
         }
 
         return $this;
     }
 
-    public function removeOuting(Outing $outing): static
+    public function removeRegisteredOuting(Outing $registeredOuting): static
     {
-        if ($this->outings->removeElement($outing)) {
-            $outing->removeParticipant($this);
+        if ($this->registeredOutings->removeElement($registeredOuting)) {
+            $registeredOuting->removeParticipant($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Outing>
+     */
+    public function getOrganizedOutings(): Collection
+    {
+        return $this->organizedOutings;
+    }
+
+    public function addOrganizedOuting(Outing $organizedOuting): static
+    {
+        if (!$this->organizedOutings->contains($organizedOuting)) {
+            $this->organizedOutings->add($organizedOuting);
+            $organizedOuting->setOrganizer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrganizedOuting(Outing $organizedOuting): static
+    {
+        if ($this->organizedOutings->removeElement($organizedOuting)) {
+            // set the owning side to null (unless already changed)
+            if ($organizedOuting->getOrganizer() === $this) {
+                $organizedOuting->setOrganizer(null);
+            }
         }
 
         return $this;

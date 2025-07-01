@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\LocationRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -36,6 +34,10 @@ class Location
      */
     #[ORM\OneToMany(targetEntity: Outing::class, mappedBy: 'location')]
     private Collection $outings;
+
+    #[ORM\ManyToOne(inversedBy: 'locations')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?City $city = null;
 
     public function __construct()
     {
@@ -133,6 +135,18 @@ class Location
                 $outing->setLocation(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCity(): ?City
+    {
+        return $this->city;
+    }
+
+    public function setCity(?City $city): static
+    {
+        $this->city = $city;
 
         return $this;
     }

@@ -21,12 +21,23 @@ class OutingTypeForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name', TextType::class)
-            ->add('startingDateTime', DateTimeType::class)
-            ->add('duration', IntegerType::class)
-            ->add('registrationDeadline', DateTimeType::class)
-            ->add('maxParticipant', IntegerType::class)
-            ->add('outingDetails', TextareaType::class)
+            ->add('name', TextType::class, [
+                "label" => "Nom de la sortie : "])
+            ->add('startingDateTime', DateTimeType::class, [
+                "label" => "Date et heure de la sortie : "
+            ])
+
+            ->add('registrationDeadline', DateTimeType::class,[
+                "label" => "Date limite d'inscription: "
+            ])
+            ->add('maxParticipant', IntegerType::class, [
+                "label" => "Nombre de places : "
+            ])
+            ->add('duration', IntegerType::class, [
+                "label" => "Durée : "
+            ])
+            ->add('outingDetails', TextareaType::class
+            )
             ->add('site', EntityType::class, [
                 'class' => Site::class,
                 'choice_label' => 'name',

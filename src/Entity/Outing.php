@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\OutingRepository;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+    use App\Repository\OutingRepository;
+    use Doctrine\Common\Collections\ArrayCollection;
+    use Doctrine\Common\Collections\Collection;
+    use Doctrine\DBAL\Types\Types;
+    use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: OutingRepository::class)]
 class Outing
@@ -34,26 +34,31 @@ class Outing
     #[ORM\Column(type: Types::TEXT)]
     private ?string $outingDetails = null;
 
-    #[ORM\ManyToOne(inversedBy: 'outings')]
-    private ?site $site = null;
-
-    #[ORM\ManyToOne(inversedBy: 'outings')]
-    private ?Status $status = null;
-
-    #[ORM\ManyToOne(inversedBy: 'outings')]
-    private ?Location $location = null;
 
     /**
      * @var Collection<int, Participant>
      */
-    #[ORM\ManyToMany(targetEntity: Participant::class, inversedBy: 'outings')]
-    private Collection $participant;
+    #[ORM\ManyToMany(targetEntity: Participant::class, inversedBy: 'registeredOutings')]
+    private Collection $participants;
+
+    #[ORM\ManyToOne(targetEntity: Status::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Status $status = null;
+
+    #[ORM\ManyToOne(inversedBy: 'organizedOutings')]
+    private ?Participant $organizer = null;
+
+    #[ORM\ManyToOne(inversedBy: 'outings')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Location $location = null;
+
+    #[ORM\ManyToOne(inversedBy: 'outings')]
+    private ?Site $site = null;
 
     public function __construct()
     {
-        $this->participant = new ArrayCollection();
+        $this->participants = new ArrayCollection();
     }
-
 
     public function getId(): ?int
     {
@@ -132,14 +137,27 @@ class Outing
         return $this;
     }
 
-    public function getSite(): ?site
+
+    /**
+     * @return Collection<int, Participant>
+     */
+    public function getParticipants(): Collection
     {
-        return $this->site;
+        return $this->participants;
     }
 
-    public function setSite(?site $site): static
+    public function addParticipant(Participant $participant): static
     {
-        $this->site = $site;
+        if (!$this->participants->contains($participant)) {
+            $this->participants->add($participant);
+        }
+
+        return $this;
+    }
+
+    public function removeParticipant(Participant $participant): static
+    {
+        $this->participants->removeElement($participant);
 
         return $this;
     }
@@ -156,6 +174,18 @@ class Outing
         return $this;
     }
 
+    public function getOrganizer(): ?Participant
+    {
+        return $this->organizer;
+    }
+
+    public function setOrganizer(?Participant $organizer): static
+    {
+        $this->organizer = $organizer;
+
+        return $this;
+    }
+
     public function getLocation(): ?Location
     {
         return $this->location;
@@ -168,27 +198,16 @@ class Outing
         return $this;
     }
 
-    /**
-     * @return Collection<int, Participant>
-     */
-    public function getParticipant(): Collection
+    public function getSite(): ?Site
     {
-        return $this->participant;
+        return $this->site;
     }
 
-    public function addParticipant(Participant $participant): static
+    public function setSite(?Site $site): static
     {
-        if (!$this->participant->contains($participant)) {
-            $this->participant->add($participant);
-        }
+        $this->site = $site;
 
         return $this;
     }
 
-    public function removeParticipant(Participant $participant): static
-    {
-        $this->participant->removeElement($participant);
-
-        return $this;
-    }
 }
