@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Outing;
+use App\Form\FilterForm;
 use App\Form\OutingTypeForm;
+use App\Repository\OutingRepository;
 use App\Repository\ParticipantRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,10 +13,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-
+#[Route('/outing', name: "outing_")]
 final class OutingController extends AbstractController
 {
-    #[Route('/outing/create', name: 'outing_create')]
+    #[Route('/create', name: 'create')]
     public function create(
         Request $request,
         EntityManagerInterface $em,
@@ -40,7 +42,31 @@ final class OutingController extends AbstractController
         }
 
         return $this->render('outing/create.html.twig', [
-            'form' => $form,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/list', name: 'list')]
+    public function list(
+        OutingRepository $outingRepository,
+        Request $request,
+    ) : Response {
+
+        $filterForm = $this->createForm(FilterForm::class);
+
+        $filterForm->handleRequest($request);
+
+        $outings = [];
+
+        if ($filterForm->isSubmitted() && $filterForm->isValid()) {
+            $filters = $filterForm->getData();
+
+            $outings = $outingRepository->findByFilter($filters);
+        }
+
+        return $this->render("outing/list.html.twig", [
+            'filterForm' => $filterForm->createView(),
+            'outings' => $outings
         ]);
 
     }

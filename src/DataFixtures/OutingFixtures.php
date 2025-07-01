@@ -64,6 +64,10 @@ class OutingFixtures extends Fixture
 
             $outing->setMaxParticipant($faker->randomNumber(2, false));
             $outing->setOutingDetails($faker->text(200));
+
+            $site = $this->getReference(('site_' . rand(0, 9)));
+            $outing->setSite($site);
+
             $outing->setStatus($statuses[array_rand($statuses)]);
             $outing->setLocation($locations[array_rand($locations)]);
 
@@ -71,5 +75,12 @@ class OutingFixtures extends Fixture
         }
 
         $manager->flush();
+    }
+
+    public function getDependencies()
+    {
+        return [
+            SiteFixtures::class,
+        ];
     }
 }
