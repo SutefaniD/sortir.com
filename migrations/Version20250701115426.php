@@ -14,7 +14,7 @@ final class Version20250701115426 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'ajout zipcode dans City';
     }
 
     public function up(Schema $schema): void
