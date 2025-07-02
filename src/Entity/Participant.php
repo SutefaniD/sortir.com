@@ -5,8 +5,8 @@ namespace App\Entity;
     use App\Repository\ParticipantRepository;
     use Doctrine\Common\Collections\ArrayCollection;
     use Doctrine\Common\Collections\Collection;
+    use Doctrine\DBAL\Types\Types;
     use Doctrine\ORM\Mapping as ORM;
-    use phpDocumentor\Reflection\Types\Boolean;
 
 #[ORM\Entity(repositoryClass: ParticipantRepository::class)]
 class Participant
@@ -16,27 +16,26 @@ class Participant
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 150)]
-    private ?string $lastName = null;
+    #[ORM\Column(length: 150, nullable: false)]
+    private string $lastName;
 
-    #[ORM\Column(length: 150)]
-    private ?string $firstName = null;
+    #[ORM\Column(length: 150, nullable: false)]
+    private string $firstName;
 
-    #[ORM\Column]
-    private ?string $phone = null;
+    #[ORM\Column(length: 14, nullable: false)]
+    private string $phone;
 
-    #[ORM\Column(length: 150)]
-    private ?string $email = null;
+    #[ORM\Column(length: 150, nullable: false)]
+    private string $email;
 
-    #[ORM\Column(length: 255)]
-    private ?string $password = null;
+    #[ORM\Column(length: 255, nullable: false)]
+    private string $password;
 
-    #[ORM\Column(type: 'boolean')]
-    private ?bool $administrator = false;
+    #[ORM\Column(type: Types::BOOLEAN, nullable: false)]
+    private bool $administrator = false;
 
-    #[ORM\Column(type: 'boolean')]
-    private ?bool $active = false;
-
+    #[ORM\Column(type: Types::BOOLEAN, nullable: false)]
+    private bool $active = false;
 
     /**
      * @var Collection<int, Outing>
@@ -61,7 +60,7 @@ class Participant
         return $this->id;
     }
 
-    public function getLastName(): ?string
+    public function getLastName(): string
     {
         return $this->lastName;
     }
@@ -73,7 +72,7 @@ class Participant
         return $this;
     }
 
-    public function getFirstName(): ?string
+    public function getFirstName(): string
     {
         return $this->firstName;
     }
@@ -85,7 +84,7 @@ class Participant
         return $this;
     }
 
-    public function getPhone(): ?string
+    public function getPhone(): string
     {
         return $this->phone;
     }
@@ -97,7 +96,7 @@ class Participant
         return $this;
     }
 
-    public function getEmail(): ?string
+    public function getEmail(): string
     {
         return $this->email;
     }
@@ -109,36 +108,41 @@ class Participant
         return $this;
     }
 
-    public function getPassword(): ?string
+    public function getPassword(): string
     {
         return $this->password;
     }
 
-    public function setPassword(?string $password): void
+    public function setPassword(string $password): static
     {
         $this->password = $password;
+
+        return $this;
     }
 
-    public function getAdministrator(): ?bool
+    public function isAdministrator(): bool
     {
         return $this->administrator;
     }
 
-    public function setAdministrator(?bool $administrator): void
+    public function setAdministrator(bool $administrator): static
     {
         $this->administrator = $administrator;
+
+        return $this;
     }
 
-    public function getActive(): ?bool
+    public function isActive(): bool
     {
         return $this->active;
     }
 
-    public function setActive(?bool $active): void
+    public function setActive(bool $active): static
     {
         $this->active = $active;
-    }
 
+        return $this;
+    }
 
     /**
      * @return Collection<int, Outing>
