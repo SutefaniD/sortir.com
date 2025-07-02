@@ -11,6 +11,7 @@ namespace App\Entity;
     use Symfony\Component\Security\Core\User\UserInterface;
 
     #[ORM\Entity(repositoryClass: ParticipantRepository::class)]
+
 class Participant implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -144,6 +145,27 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
         $this->active = $active;
 
         return $this;
+    }
+
+    public function getRoles(): array
+    {
+        $roles = ['ROLE_USER'];
+
+        if ($this->administrator) {
+            $roles[] = 'ROLE_ADMIN';
+        }
+
+        return $roles;
+    }
+
+    public function eraseCredentials(): void
+    {
+        // TODO: Implement eraseCredentials() method.
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
     }
 
     public function getRoles(): array
