@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}All participants{% endblock %}
+
+{% block css %}{% endblock %}
+
+{% block main %}
+    <div class="container">
+        {% foreach participant in participants %}
+            {{ participant.firstName }}
+        {% endfor %}
+    </div>
+{% endblock %}

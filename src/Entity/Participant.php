@@ -2,16 +2,17 @@
 
 namespace App\Entity;
 
-    use App\Repository\ParticipantRepository;
-    use Doctrine\Common\Collections\ArrayCollection;
-    use Doctrine\Common\Collections\Collection;
-    use Doctrine\DBAL\Types\Types;
-    use Doctrine\ORM\Mapping as ORM;
-    use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-    use Symfony\Component\Security\Core\User\UserInterface;
+use App\Repository\ParticipantRepository;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
 
-    #[ORM\Entity(repositoryClass: ParticipantRepository::class)]
-
+#[UniqueEntity('email', message: 'Cet email est déjà utilisé.')]
+#[ORM\Entity(repositoryClass: ParticipantRepository::class)]
 class Participant implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -19,20 +20,36 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotBlank(message: 'Please enter your last name')]
+    #[Assert\Length(max: 150, maxMessage: 'Too long ! 150 characters at most !')]
     #[ORM\Column(length: 150, nullable: false)]
-    private string $lastName;
+    private ?string $lastName = null;
 
+    #[Assert\NotBlank(message: 'Please enter your first name')]
+    #[Assert\Length(max: 150, maxMessage: 'Too long ! 150 characters at most !')]
     #[ORM\Column(length: 150, nullable: false)]
-    private string $firstName;
+    private ?string $firstName = null;
 
+    #[Assert\NotBlank(message: 'Please enter your username')]
+    #[Assert\Length(max: 150, maxMessage: 'Too long ! 150 characters at most !')]
+    #[ORM\Column(length: 150, nullable: false, unique: true)]
+    private ?string $username = null;
+
+    #[Assert\NotBlank(message: 'Please enter your phone number')]
+    #[Assert\Length(min: 10, maxMessage: 'Too short ! 10 characters at least !')]
+    #[Assert\Length(max: 10, maxMessage: 'Too long ! 10 characters at most !')]
     #[ORM\Column(length: 14, nullable: false)]
-    private string $phone;
+    private ?string $phone = null;
 
+    #[Assert\NotBlank(message: 'Please enter your email')]
+    #[Assert\Length(max: 150, maxMessage: 'Too long ! 150 characters at most !')]
     #[ORM\Column(length: 150, nullable: false)]
-    private string $email;
+    private ?string $email = null;
 
+    #[Assert\NotBlank(message: 'Please enter your password')]
+    #[Assert\Length(max: 255, maxMessage: 'Too long ! 255 characters at most !')]
     #[ORM\Column(length: 255, nullable: false)]
-    private string $password;
+    private ?string $password = null;
 
     #[ORM\Column(type: Types::BOOLEAN, nullable: false)]
     private bool $administrator = false;
@@ -85,6 +102,16 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
         $this->firstName = $firstName;
 
         return $this;
+    }
+
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    public function setUsername(string $username): void
+    {
+        $this->username = $username;
     }
 
     public function getPhone(): string
@@ -223,5 +250,10 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->active ?? false;
     }
 }
