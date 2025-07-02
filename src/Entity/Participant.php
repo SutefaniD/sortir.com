@@ -168,27 +168,6 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
-    public function getRoles(): array
-    {
-        $roles = ['ROLE_USER'];
-
-        if ($this->administrator) {
-            $roles[] = 'ROLE_ADMIN';
-        }
-
-        return $roles;
-    }
-
-    public function eraseCredentials(): void
-    {
-        // TODO: Implement eraseCredentials() method.
-    }
-
-    public function getUserIdentifier(): string
-    {
-        return $this->email;
-    }
-
     /**
      * @return Collection<int, Outing>
      */
