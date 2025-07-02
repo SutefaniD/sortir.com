@@ -18,7 +18,7 @@ class Status
     private ?int $id = null;
 
     #[ORM\Column(type: Types::STRING, enumType: StatusName::class)]
-    private StatusName $name;
+    private StatusName $label;
 
     /**
      * @var Collection<int, Outing>
@@ -36,17 +36,15 @@ class Status
         return $this->id;
     }
 
-    public function getName(): StatusName
+    public function getLabel(): StatusName
     {
-        return $this->name;
+        return $this->label;
     }
 
-    public function setName(StatusName $name): void
+    public function setLabel(StatusName $label): void
     {
-        $this->name = $name;
+        $this->label = $label;
     }
-
-
 
     /**
      * @return Collection<int, Outing>
