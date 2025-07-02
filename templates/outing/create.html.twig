@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer une sortie{% endblock %}
+
+{% block body %}
+
+    <h1>Créer une nouvelle sortie</h1>
+
+
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    {{ form_end(form) }}
+    <h2>Lieu</h2>
+
+
+
+
+    <button class="btn btn-success">Créer la sortie</button>
+    <button class="btn btn-primary">Publier</button>
+    <button class="btn btn-danger">Annuler</button>
+
+
+
+
+
+{% endblock %}
