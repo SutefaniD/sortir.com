@@ -19,6 +19,10 @@ body > main {
     justify-content: center;
 }
 
+h2 {
+    margin-bottom: 2rem;
+}
+
 /************************************************** Navbar **************************************************/
 header {
     background-color: #f8f9fa;

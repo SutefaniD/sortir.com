@@ -2,12 +2,42 @@
 
 {% block title %}All participants{% endblock %}
 
-{% block css %}{% endblock %}
+{% block css %}<link rel="stylesheet" href="{{ asset('assets/css/admin.css') }}">{% endblock %}
 
 {% block main %}
     <div class="container">
-        {% foreach participant in participants %}
-            {{ participant.firstName }}
+        <h2>Liste des participants</h2>
+        {% for participant in participants %}
+            <div class="participant-row">
+                <div class="participant-field">
+                    <span class="label">Last name</span>
+                    <span class="value">{{ participant.lastName }}</span>
+                </div>
+                <div class="participant-field">
+                    <span class="label">First name</span>
+                    <span class="value">{{ participant.firstName }}</span>
+                </div>
+                <div class="participant-field">
+                    <span class="label">Username</span>
+                    <span class="value">{{ participant.username }}</span>
+                </div>
+                <div class="participant-field">
+                    <span class="label">Phone</span>
+                    <span class="value">{{ participant.phone }}</span>
+                </div>
+                <div class="participant-field">
+                    <span class="label">Email</span>
+                    <span class="value">{{ participant.email }}</span>
+                </div>
+                <div class="participant-field">
+                    <span class="label">Active</span>
+                    <span class="value">{{ participant.active ? 'true' : 'false' }}</span>
+                </div>
+                <div class="participant-field">
+                    <span><a href="{{ path('admin_disable_user', {'id': participant.id}) }}">{{ participant.active ? 'Disable' : 'Enable' }}</a></span>
+                    <span><a href="{{ path('admin_delete_user', {'id': participant.id}) }}">Supprimer</a></span>
+                </div>
+            </div>
         {% endfor %}
     </div>
 {% endblock %}
