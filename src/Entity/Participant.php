@@ -7,9 +7,11 @@ namespace App\Entity;
     use Doctrine\Common\Collections\Collection;
     use Doctrine\DBAL\Types\Types;
     use Doctrine\ORM\Mapping as ORM;
+    use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+    use Symfony\Component\Security\Core\User\UserInterface;
 
-#[ORM\Entity(repositoryClass: ParticipantRepository::class)]
-class Participant
+    #[ORM\Entity(repositoryClass: ParticipantRepository::class)]
+class Participant implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -120,7 +122,7 @@ class Participant
         return $this;
     }
 
-    public function isAdministrator(): bool
+    public function getAdministrator(): bool
     {
         return $this->administrator;
     }
@@ -132,7 +134,7 @@ class Participant
         return $this;
     }
 
-    public function isActive(): bool
+    public function getActive(): bool
     {
         return $this->active;
     }
@@ -142,6 +144,27 @@ class Participant
         $this->active = $active;
 
         return $this;
+    }
+
+    public function getRoles(): array
+    {
+        $roles = ['ROLE_USER'];
+
+        if ($this->administrator) {
+            $roles[] = 'ROLE_ADMIN';
+        }
+
+        return $roles;
+    }
+
+    public function eraseCredentials(): void
+    {
+        // TODO: Implement eraseCredentials() method.
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
     }
 
     /**
