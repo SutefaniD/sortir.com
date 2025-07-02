@@ -7,6 +7,12 @@ use Doctrine\ORM\Mapping as ORM;
 use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use App\Repository\ParticipantRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use phpDocumentor\Reflection\Types\Boolean;
+
 
 #[ORM\Entity(repositoryClass: ParticipantRepository::class)]
 class Participant implements UserInterface, PasswordAuthenticatedUserInterface
@@ -23,7 +29,7 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $firstName = null;
 
     #[ORM\Column]
-    private ?int $phone = null;
+    private ?string $phone = null;
 
     #[ORM\Column(length: 150)]
     private ?string $email = null;
@@ -36,6 +42,25 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'boolean')]
     private ?bool $active = false;
+
+
+    /**
+     * @var Collection<int, Outing>
+     */
+    #[ORM\ManyToMany(targetEntity: Outing::class, mappedBy: 'participants')]
+    private Collection $registeredOutings;
+
+    /**
+     * @var Collection<int, Outing>
+     */
+    #[ORM\OneToMany(targetEntity: Outing::class, mappedBy: 'organizer')]
+    private Collection $organizedOutings;
+
+    public function __construct()
+    {
+        $this->registeredOutings = new ArrayCollection();
+        $this->organizedOutings = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -66,12 +91,12 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getPhone(): ?int
+    public function getPhone(): ?string
     {
         return $this->phone;
     }
 
-    public function setPhone(int $phone): static
+    public function setPhone(string $phone): static
     {
         $this->phone = $phone;
 
@@ -120,6 +145,7 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
         $this->active = $active;
     }
 
+
     public function getRoles(): array
     {
         $roles = ['ROLE_USER'];
@@ -139,5 +165,61 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUserIdentifier(): string
     {
         return $this->email;
+
+    /**
+     * @return Collection<int, Outing>
+     */
+    public function getRegisteredOutings(): Collection
+    {
+        return $this->registeredOutings;
+    }
+
+    public function addRegisteredOuting(Outing $registeredOuting): static
+    {
+        if (!$this->registeredOutings->contains($registeredOuting)) {
+            $this->registeredOutings->add($registeredOuting);
+            $registeredOuting->addParticipant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRegisteredOuting(Outing $registeredOuting): static
+    {
+        if ($this->registeredOutings->removeElement($registeredOuting)) {
+            $registeredOuting->removeParticipant($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Outing>
+     */
+    public function getOrganizedOutings(): Collection
+    {
+        return $this->organizedOutings;
+    }
+
+    public function addOrganizedOuting(Outing $organizedOuting): static
+    {
+        if (!$this->organizedOutings->contains($organizedOuting)) {
+            $this->organizedOutings->add($organizedOuting);
+            $organizedOuting->setOrganizer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrganizedOuting(Outing $organizedOuting): static
+    {
+        if ($this->organizedOutings->removeElement($organizedOuting)) {
+            // set the owning side to null (unless already changed)
+            if ($organizedOuting->getOrganizer() === $this) {
+                $organizedOuting->setOrganizer(null);
+            }
+        }
+
+        return $this;
     }
 }

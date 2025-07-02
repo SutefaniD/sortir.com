@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\SiteRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SiteRepository::class)]
@@ -15,6 +17,17 @@ class Site
 
     #[ORM\Column(length: 150)]
     private ?string $name = null;
+
+    /**
+     * @var Collection<int, Outing>
+     */
+    #[ORM\OneToMany(targetEntity: Outing::class, mappedBy: 'site')]
+    private Collection $outings;
+
+    public function __construct()
+    {
+        $this->outings = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -32,4 +45,36 @@ class Site
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Outing>
+     */
+    public function getOutings(): Collection
+    {
+        return $this->outings;
+    }
+
+    public function addOuting(Outing $outing): static
+    {
+        if (!$this->outings->contains($outing)) {
+            $this->outings->add($outing);
+            $outing->setSite($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOuting(Outing $outing): static
+    {
+        if ($this->outings->removeElement($outing)) {
+            // set the owning side to null (unless already changed)
+            if ($outing->getSite() === $this) {
+                $outing->setSite(null);
+            }
+        }
+
+        return $this;
+    }
+
+
 }
