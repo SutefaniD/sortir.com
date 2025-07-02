@@ -13,22 +13,24 @@ class ParticipantForm extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('lastName')
-            ->add('firstName')
-            ->add('phone')
-            ->add('email');
+        if ($options['include_profile']) {
+            $builder
+                ->add('lastName')
+                ->add('firstName')
+                ->add('phone')
+                ->add('email');
+        }
 
-            if ($options['include_password']) {
-                $builder
-                    ->add('password', PasswordType::class)
-                    -> add('confirmPassword', PasswordType::class, [
-                        'mapped' => false,
-                        'required' => true,
-                    ]);
-            }
+        if ($options['include_password']) {
+            $builder
+                ->add('password', PasswordType::class)
+                -> add('confirmPassword', PasswordType::class, [
+                    'mapped' => false,
+                    'required' => true,
+                ]);
+        }
 
-            $builder->add('submit', SubmitType::class)
+        $builder->add('submit', SubmitType::class)
         ;
     }
 
@@ -36,6 +38,7 @@ class ParticipantForm extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Participant::class,
+            'include_profile' => true,
             'include_password' => true,
         ]);
     }
