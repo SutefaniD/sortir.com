@@ -58,9 +58,6 @@ class OutingFixtures extends Fixture implements DependentFixtureInterface
                 $outing->addParticipant($participant);
             }
 
-            $siteReference = $this->getReference('site_' . rand(0, count(SiteFixtures::SITE_NAMES) - 1), SiteFixtures::class);
-            $outing->setSite($siteReference);
-
             $locationReference = $this->getReference('location_' . rand(0, LocationFixtures::LOCATION_COUNT - 1), LocationFixtures::class);
             $outing->setLocation($locationReference);
 
@@ -76,7 +73,6 @@ class OutingFixtures extends Fixture implements DependentFixtureInterface
         return [
             ParticipantFixtures::class,
             LocationFixtures::class,
-            SiteFixtures::class
         ];
     }
 }
