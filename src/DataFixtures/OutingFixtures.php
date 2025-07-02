@@ -7,10 +7,11 @@ use App\Entity\Status;
 use App\Enum\StatusName;
 use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 
-class OutingFixtures extends Fixture
+class OutingFixtures extends Fixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
@@ -63,11 +64,19 @@ class OutingFixtures extends Fixture
             $locationReference = $this->getReference('location_' . rand(0, LocationFixtures::LOCATION_COUNT - 1), LocationFixtures::class);
             $outing->setLocation($locationReference);
 
-
             $manager->persist($outing);
             $this->addReference('outing_' . $i, $outing);
         }
 
         $manager->flush();
+    }
+
+    public function getDependencies(): array
+    {
+        return [
+            ParticipantFixtures::class,
+            LocationFixtures::class,
+            SiteFixtures::class
+        ];
     }
 }

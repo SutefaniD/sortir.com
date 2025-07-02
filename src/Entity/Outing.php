@@ -53,10 +53,6 @@ class Outing
     #[ORM\JoinColumn(nullable: false)]
     private ?Location $location = null;
 
-    #[ORM\ManyToOne(inversedBy: 'outings')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Site $site = null;
-
     public function __construct()
     {
         $this->participants = new ArrayCollection();
@@ -200,17 +196,4 @@ class Outing
 
         return $this;
     }
-
-    public function getSite(): ?Site
-    {
-        return $this->site;
-    }
-
-    public function setSite(?Site $site): static
-    {
-        $this->site = $site;
-
-        return $this;
-    }
-
 }

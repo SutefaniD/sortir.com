@@ -21,12 +21,12 @@ class Site
     /**
      * @var Collection<int, Outing>
      */
-    #[ORM\OneToMany(targetEntity: Outing::class, mappedBy: 'site')]
-    private Collection $outings;
+    #[ORM\OneToMany(targetEntity: Participant::class, mappedBy: 'site')]
+    private Collection $participants;
 
     public function __construct()
     {
-        $this->outings = new ArrayCollection();
+        $this->participants = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -49,27 +49,27 @@ class Site
     /**
      * @return Collection<int, Outing>
      */
-    public function getOutings(): Collection
+    public function getParticipants(): Collection
     {
-        return $this->outings;
+        return $this->participants;
     }
 
-    public function addOuting(Outing $outing): static
+    public function addParticipant(Participant $participant): static
     {
-        if (!$this->outings->contains($outing)) {
-            $this->outings->add($outing);
-            $outing->setSite($this);
+        if (!$this->participants->contains($participant)) {
+            $this->participants->add($participant);
+            $participant->setSite($this);
         }
 
         return $this;
     }
 
-    public function removeOuting(Outing $outing): static
+    public function removeParticipant(Participant $participant): static
     {
-        if ($this->outings->removeElement($outing)) {
+        if ($this->participants->removeElement($participant)) {
             // set the owning side to null (unless already changed)
-            if ($outing->getSite() === $this) {
-                $outing->setSite(null);
+            if ($participant->getSite() === $this) {
+                $participant->setSite(null);
             }
         }
 
