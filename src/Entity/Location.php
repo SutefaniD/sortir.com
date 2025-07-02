@@ -16,14 +16,11 @@ class Location
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?int $locationID = null;
+    #[ORM\Column(length: 250, nullable: false)]
+    private string $name;
 
-    #[ORM\Column(length: 250, nullable: true)]
-    private ?string $name = null;
-
-    #[ORM\Column(length: 150, nullable: true)]
-    private ?string $street = null;
+    #[ORM\Column(length: 100, nullable: false)]
+    private string $street;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 8, nullable: true)]
     private ?string $latitude = null;
@@ -51,36 +48,24 @@ class Location
         return $this->id;
     }
 
-    public function getLocationID(): ?int
-    {
-        return $this->locationID;
-    }
-
-    public function setLocationID(int $locationID): static
-    {
-        $this->locationID = $locationID;
-
-        return $this;
-    }
-
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function setName(?string $name): static
+    public function setName(string $name): static
     {
         $this->name = $name;
 
         return $this;
     }
 
-    public function getStreet(): ?string
+    public function getStreet(): string
     {
         return $this->street;
     }
 
-    public function setStreet(?string $street): static
+    public function setStreet(string $street): static
     {
         $this->street = $street;
 
@@ -111,9 +96,6 @@ class Location
         return $this;
     }
 
-    /**
-     * @return Collection<int, Outing>
-     */
     public function getOutings(): Collection
     {
         return $this->outings;

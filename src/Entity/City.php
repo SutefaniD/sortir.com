@@ -18,14 +18,14 @@ class City
     #[ORM\Column(length: 150)]
     private ?string $name = null;
 
+    #[ORM\Column(length: 6, nullable: true)]
+    private ?string $zipCode = null;
+
     /**
      * @var Collection<int, Location>
      */
     #[ORM\OneToMany(targetEntity: Location::class, mappedBy: 'city')]
     private Collection $locations;
-
-    #[ORM\Column(length: 6, nullable: true)]
-    private ?string $zipCode = null;
 
     public function __construct()
     {
@@ -45,6 +45,18 @@ class City
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getZipCode(): ?string
+    {
+        return $this->zipCode;
+    }
+
+    public function setZipCode(?string $zipCode): static
+    {
+        $this->zipCode = $zipCode;
 
         return $this;
     }
@@ -75,18 +87,6 @@ class City
                 $location->setCity(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getZipCode(): ?string
-    {
-        return $this->zipCode;
-    }
-
-    public function setZipCode(?string $zipCode): static
-    {
-        $this->zipCode = $zipCode;
 
         return $this;
     }

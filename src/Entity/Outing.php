@@ -3,12 +3,14 @@
 namespace App\Entity;
 
     use App\Repository\OutingRepository;
+    use DateTime;
+    use DateTimeInterface;
     use Doctrine\Common\Collections\ArrayCollection;
     use Doctrine\Common\Collections\Collection;
     use Doctrine\DBAL\Types\Types;
     use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: OutingRepository::class)]
+    #[ORM\Entity(repositoryClass: OutingRepository::class)]
 class Outing
 {
     #[ORM\Id]
@@ -16,24 +18,23 @@ class Outing
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    #[ORM\Column(length: 255, nullable: false)]
+    private string $name;
 
-    #[ORM\Column]
-    private ?\DateTime $startingDateTime = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: false)]
+    private \DateTimeInterface $startingDateTime;
 
-    #[ORM\Column]
-    private ?int $duration = null;
+    #[ORM\Column(type: Types::INTEGER, nullable: false)]
+    private int $duration;
 
-    #[ORM\Column]
-    private ?\DateTime $registrationDeadline = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: false)]
+    private DateTimeInterface $registrationDeadline;
 
-    #[ORM\Column]
-    private ?int $maxParticipant = null;
+    #[ORM\Column(type: Types::INTEGER, nullable: false)]
+    private int $maxParticipants;
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $outingDetails = null;
-
 
     /**
      * @var Collection<int, Participant>
@@ -41,18 +42,19 @@ class Outing
     #[ORM\ManyToMany(targetEntity: Participant::class, inversedBy: 'registeredOutings')]
     private Collection $participants;
 
+    #[ORM\ManyToOne(inversedBy: 'organizedOutings')]
+    private ?Participant $organizer = null;
+
     #[ORM\ManyToOne(targetEntity: Status::class)]
     #[ORM\JoinColumn(nullable: false)]
     private ?Status $status = null;
-
-    #[ORM\ManyToOne(inversedBy: 'organizedOutings')]
-    private ?Participant $organizer = null;
 
     #[ORM\ManyToOne(inversedBy: 'outings')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Location $location = null;
 
     #[ORM\ManyToOne(inversedBy: 'outings')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Site $site = null;
 
     public function __construct()
@@ -65,7 +67,7 @@ class Outing
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -77,19 +79,19 @@ class Outing
         return $this;
     }
 
-    public function getStartingDateTime(): ?\DateTime
+    public function getStartingDateTime(): DateTimeInterface
     {
         return $this->startingDateTime;
     }
 
-    public function setStartingDateTime(\DateTime $startingDateTime): static
+    public function setStartingDateTime(DateTimeInterface $startingDateTime): static
     {
         $this->startingDateTime = $startingDateTime;
 
         return $this;
     }
 
-    public function getDuration(): ?int
+    public function getDuration(): int
     {
         return $this->duration;
     }
@@ -101,26 +103,26 @@ class Outing
         return $this;
     }
 
-    public function getRegistrationDeadline(): ?\DateTime
+    public function getRegistrationDeadline(): DateTimeInterface
     {
         return $this->registrationDeadline;
     }
 
-    public function setRegistrationDeadline(\DateTime $registrationDeadline): static
+    public function setRegistrationDeadline(DateTimeInterface $registrationDeadline): static
     {
         $this->registrationDeadline = $registrationDeadline;
 
         return $this;
     }
 
-    public function getMaxParticipant(): ?int
+    public function getMaxParticipants(): int
     {
-        return $this->maxParticipant;
+        return $this->maxParticipants;
     }
 
-    public function setMaxParticipant(int $maxParticipant): static
+    public function setMaxParticipants(int $maxParticipants): static
     {
-        $this->maxParticipant = $maxParticipant;
+        $this->maxParticipants = $maxParticipants;
 
         return $this;
     }
@@ -130,13 +132,12 @@ class Outing
         return $this->outingDetails;
     }
 
-    public function setOutingDetails(string $outingDetails): static
+    public function setOutingDetails(?string $outingDetails): static
     {
         $this->outingDetails = $outingDetails;
 
         return $this;
     }
-
 
     /**
      * @return Collection<int, Participant>
@@ -150,6 +151,7 @@ class Outing
     {
         if (!$this->participants->contains($participant)) {
             $this->participants->add($participant);
+            $participant->addRegisteredOuting($this);
         }
 
         return $this;
@@ -158,6 +160,7 @@ class Outing
     public function removeParticipant(Participant $participant): static
     {
         $this->participants->removeElement($participant);
+        $participant->removeRegisteredOuting($this);
 
         return $this;
     }
