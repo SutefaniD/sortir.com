@@ -41,7 +41,7 @@ class OutingFixtures extends Fixture
             }
 
             $organizerIndex = rand(0,19);
-            $organizer = $this->getReference('participant_' . $organizerIndex);
+            $organizer = $this->getReference('participant_' . $organizerIndex, ParticipantFixtures::class);
             $outing->setOrganizer($organizer);
 
             $possibleParticipants = range(0, 19);
@@ -53,14 +53,14 @@ class OutingFixtures extends Fixture
             $participantsIndex = (array)array_rand($possibleParticipants, $participantsRegistered);
 
             foreach ($participantsIndex as $index) {
-                $participant = $this->getReference('participant_' . $possibleParticipants[$index]);
+                $participant = $this->getReference('participant_' . $possibleParticipants[$index], ParticipantFixtures::class);
                 $outing->addParticipant($participant);
             }
 
-            $siteReference = $this->getReference('site_' . rand(0, count(SiteFixtures::SITE_NAMES) - 1));
+            $siteReference = $this->getReference('site_' . rand(0, count(SiteFixtures::SITE_NAMES) - 1), SiteFixtures::class);
             $outing->setSite($siteReference);
 
-            $locationReference = $this->getReference('location_' . rand(0, LocationFixtures::LOCATION_COUNT - 1));
+            $locationReference = $this->getReference('location_' . rand(0, LocationFixtures::LOCATION_COUNT - 1), LocationFixtures::class);
             $outing->setLocation($locationReference);
 
 
@@ -70,10 +70,4 @@ class OutingFixtures extends Fixture
 
         $manager->flush();
     }
-
-    public function getDependencies()
-    {
-        return [SiteFixtures::class, LocationFixtures::class, ParticipantFixtures::class];
-    }
-
 }

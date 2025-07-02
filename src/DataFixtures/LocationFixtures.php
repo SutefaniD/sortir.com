@@ -6,9 +6,8 @@ use App\Entity\Location;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
-class LocationFixtures extends Fixture implements DependentFixtureInterface
+class LocationFixtures extends Fixture
 {
     public const LOCATION_COUNT = 15;
 
@@ -21,8 +20,7 @@ class LocationFixtures extends Fixture implements DependentFixtureInterface
             $location->setName($faker->company);
             $location->setStreet($faker->streetAddress);
 
-            // Associer à une ville parmi les villes déjà créées
-            $cityReference = $this->getReference('city_' . rand(0, CityFixtures::CITY_COUNT - 1));
+            $cityReference = $this->getReference('city_' . rand(0, CityFixtures::CITY_COUNT - 1), CityFixtures::class);
             $location->setCity($cityReference);
 
             $manager->persist($location);
@@ -30,10 +28,5 @@ class LocationFixtures extends Fixture implements DependentFixtureInterface
         }
 
         $manager->flush();
-    }
-
-    public function getDependencies() : array
-    {
-        return [CityFixtures::class];
     }
 }
