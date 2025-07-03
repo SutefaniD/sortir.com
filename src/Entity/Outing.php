@@ -74,6 +74,9 @@ class Outing
     #[Assert\NotNull(message: "Le lieu est requis.")]
     private ?Location $location = null;
 
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $cancelReason = null;
+
     #[ORM\ManyToOne(inversedBy: 'outings')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotNull(message: "Le site est obligatoire.")]
@@ -223,16 +226,23 @@ class Outing
         return $this;
     }
 
+    public function getCancelReason(): ?string
+    {
+        return $this->cancelReason;
+    }
+
+    public function setCancelReason(?string $cancelReason): void
+    {
+        $this->cancelReason = $cancelReason;
+    }
+
     public function getSite(): ?Site
     {
         return $this->site;
     }
 
-    public function setSite(?Site $site): static
+    public function setSite(?Site $site): void
     {
         $this->site = $site;
-
-        return $this;
     }
-
 }

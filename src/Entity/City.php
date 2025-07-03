@@ -17,7 +17,7 @@ class City
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 150)]
+    #[ORM\Column(length: 150, unique: true, nullable: false)]
     #[Assert\NotBlank(message: "Le nom de la ville est obligatoire.")]
     #[Assert\Length(
         max: 150,

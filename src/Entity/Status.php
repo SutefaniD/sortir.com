@@ -41,9 +41,11 @@ class Status
         return $this->label;
     }
 
-    public function setLabel(StatusName $label): void
+    public function setLabel(StatusName $label): static
     {
         $this->label = $label;
+
+        return $this;
     }
 
     /**

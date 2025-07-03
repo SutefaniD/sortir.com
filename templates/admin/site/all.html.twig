@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}All site{% endblock %}
+
+{% block css %}<link rel="stylesheet" href="{{ asset('assets/css/admin.css') }}">{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <h2>Liste des sites</h2><a href="{{ path('admin_create_site') }}">Create site</a>
+        {% for site in sites %}
+            <div class="participant-row">
+                <div class="participant-field">
+                    <span class="label">Name</span>
+                    <span class="value">{{ site.name }}</span>
+                </div>
+                <div class="participant-field">
+                    <span><a href="{{ path('admin_update_site', {'id': site.id}) }}">Update</a></span>
+                    <span><a href="{{ path('admin_delete_site', {'id': site.id}) }}">Supprimer</a></span>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
