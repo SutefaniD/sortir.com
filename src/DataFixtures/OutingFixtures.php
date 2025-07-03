@@ -2,74 +2,79 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\City;
 use App\Entity\Location;
+use App\Entity\Participant;
 use App\Entity\Outing;
 use App\Entity\Status;
 use App\Enum\StatusName;
+use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 
-class OutingFixtures extends Fixture
+class OutingFixtures extends Fixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
-        $faker = Factory::create();
+        $now = new DateTime();
+        $statusOngoing = (new Status())->setLabel(StatusName::ONGOING);
+        $statusPast = (new Status())->setLabel(StatusName::PAST);
+        $manager->persist($statusOngoing);
+        $manager->persist($statusPast);
 
-        $statusValues = [
-            StatusName::CREATED,
-            StatusName::ONGOING,
-            StatusName::PAST,
-            StatusName::CANCELLED,
-        ];
+        $faker = Factory::create('fr_FR');
 
-        $statuses = [];
-        foreach ($statusValues as $statusName) {
-            $status = new Status();
-            $status->setName($statusName);
-            $manager->persist($status);
-            $statuses[] = $status;
-        }
-
-        $cities = [];
-        for ($i = 0; $i < 5; $i++) {
-            $city = new City();
-            $city->setName($faker->city());
-            $manager->persist($city);
-            $cities[] = $city;
-        }
-
-        $locations = [];
-
-        for ($i = 0; $i < 10; $i++) {
-            $location = new Location();
-            $location->setLocationID($i);
-            $location->setName($faker->streetName());
-            $location->setCity($cities[array_rand($cities)]);
-            $manager->persist($location);
-            $locations[] = $location;
-        }
-
-        for ($i = 0; $i < 25; $i++) {
+        for ($i = 0; $i < 20; $i++) {
             $outing = new Outing();
-            $outing->setName($faker->sentence());
 
-            $startingDate = $faker->dateTimeBetween('-6 months', '+6 months');
-            $outing->setStartingDateTime($startingDate);
+            $outing->setName($faker->sentence(3));
+            $startDate = (new \DateTime())->modify(rand(-10, 10) . ' days');
+            $outing->setStartingDateTime($startDate);
+            $outing->setDuration($faker->numberBetween(1, 8)); // durée en heures
+            $outing->setRegistrationDeadline((clone $startDate)->modify('-1 days'));
+            $outing->setMaxParticipants(rand(3, 100));
+            $outing->setOutingDetails($faker->text(100));
 
-            $outing->setDuration($faker->randomNumber(3, false));
+            // pour le moment que 2 statuts
+            if ($startDate > $now) {
+                $outing->setStatus($statusOngoing);
+            } else {
+                $outing->setStatus($statusPast);
+            }
 
-            $outing->setRegistrationDeadline($faker->dateTimeBetween('-1 year', $startingDate)); // pas sure
+            $organizerIndex = rand(0,19);
+            $organizer = $this->getReference('participant_' . $organizerIndex, Participant::class);
+            $outing->setOrganizer($organizer);
 
-            $outing->setMaxParticipant($faker->randomNumber(2, false));
-            $outing->setOutingDetails($faker->text(200));
-            $outing->setStatus($statuses[array_rand($statuses)]);
-            $outing->setLocation($locations[array_rand($locations)]);
+            $possibleParticipants = range(0, 19);
+            unset($possibleParticipants[$organizerIndex]); // enlève l'organisateur de la liste
+            $possibleParticipants = array_values($possibleParticipants); // Réindexe le tableau pour éviter des trous dans les clés
+
+            $participantsRegistered = rand(2, 10);
+            // attention, array_rand renvoie un int si 1 élément, un tableau si >= 2
+            $participantsIndex = (array)array_rand($possibleParticipants, $participantsRegistered);
+
+            foreach ($participantsIndex as $index) {
+                $participant = $this->getReference('participant_' . $possibleParticipants[$index], Participant::class);
+                $outing->addParticipant($participant);
+            }
+
+            $locationReference = $this->getReference('location_' . rand(0, LocationFixtures::LOCATION_COUNT - 1), Location::class);
+            $outing->setLocation($locationReference);
 
             $manager->persist($outing);
+            $this->addReference('outing_' . $i, $outing);
         }
 
         $manager->flush();
+    }
+
+    public function getDependencies(): array
+    {
+        return [
+            ParticipantFixtures::class,
+            LocationFixtures::class,
+        ];
     }
 }
