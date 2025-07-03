@@ -1,0 +1,21 @@
+/************************************************** OutingTypeForm **************************************************/
+main{
+    display:flex;
+    flex-direction: column;
+    justify-items: center;
+    align-content: center;
+}
+.outing{
+    display:flex;
+    flex-direction: column;
+    justify-items: center;
+    align-content: center;
+
+}
+h1{
+    align-self: center;
+}
+.input{
+    margin-top: 10px;
+
+}

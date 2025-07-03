@@ -16,8 +16,11 @@ class LocationForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('locationID', IntegerType::class, [
-                'label' => 'ID du lieu'
+           // ->add('locationID', IntegerType::class, [
+             //   'label' => 'ID du lieu'
+            //])
+            ->add('name', TextType::class, [
+                'label' => 'Nom du lieu'
             ])
             ->add('city', EntityType::class, [
                 'class' => City::class,
@@ -25,13 +28,15 @@ class LocationForm extends AbstractType
                 'label' => 'Ville'
             ])
 
-            ->add('name', TextType::class, [
-                'label' => 'Nom du lieu'
-            ])
+
             ->add('street', TextType::class, [
                 'label' => 'Rue'
             ])
-            ->add('zipCode')
+            ->add('zipCode', TextType::class, [
+                'label' => 'Code postal',
+                'mapped' => false,
+                'disabled' => false,
+            ])
             ->add('latitude', TextType::class, [
                 'label' => 'Latitude'
             ])

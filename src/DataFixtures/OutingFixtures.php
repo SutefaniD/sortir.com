@@ -62,7 +62,7 @@ class OutingFixtures extends Fixture
 
             $outing->setRegistrationDeadline($faker->dateTimeBetween('-1 year', $startingDate)); // pas sure
 
-            $outing->setMaxParticipant($faker->randomNumber(2, false));
+            $outing->setMaxParticipants($faker->randomNumber(2, false));
             $outing->setOutingDetails($faker->text(200));
             $outing->setStatus($statuses[array_rand($statuses)]);
             $outing->setLocation($locations[array_rand($locations)]);

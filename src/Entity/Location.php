@@ -7,6 +7,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
+
 
 #[ORM\Entity(repositoryClass: LocationRepository::class)]
 class Location
@@ -17,15 +20,33 @@ class Location
     private ?int $id = null;
 
     #[ORM\Column(length: 250, nullable: false)]
+    #[Assert\NotBlank(message: "Le nom est obligatoire.")]
+    #[Assert\Length(
+        max: 250,
+        maxMessage: "Le nom ne doit pas dépasser {{ limit }} caractères."
+    )]
     private string $name;
 
     #[ORM\Column(length: 100, nullable: false)]
+    #[Assert\NotBlank(message: "La rue est obligatoire.")]
+    #[Assert\Length(
+        max: 100,
+        maxMessage: "La rue ne doit pas dépasser {{ limit }} caractères."
+    )]
     private string $street;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 8, nullable: true)]
+    #[Assert\Regex(
+        pattern: '/^-?\d{1,2}(\.\d{1,8})?$/',
+        message: "La latitude doit être un nombre valide."
+    )]
     private ?string $latitude = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 11, scale: 8, nullable: true)]
+    #[Assert\Regex(
+        pattern: '/^-?\d{1,3}(\.\d{1,8})?$/',
+        message: "La longitude doit être un nombre valide."
+    )]
     private ?string $longitude = null;
 
     /**
@@ -36,6 +57,7 @@ class Location
 
     #[ORM\ManyToOne(inversedBy: 'locations')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message: "La ville est obligatoire.")]
     private ?City $city = null;
 
     public function __construct()

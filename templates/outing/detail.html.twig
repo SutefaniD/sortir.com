@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+{% block title %}Afficher une sortie{% endblock %}
+{% block main %}
+    <div id="outingDetails" class="outing-details">
+        <h2>Afficher une sortie</h2>
+
+        <ul>
+            <li> : {{outing.name}}</li>
+            <li> : {{outing.registrationDeadline }}</li>
+            <li> : {{form.maxParticipants }}</li>
+            <li> : {{startingDateTime }}</li>
+            <li> : {{startingDateTime }}</li>
+            <li>First name : {{ app.user.firstName }}</li>
+            <li>Phone : {{ app.user.phone }}</li>
+            <li>Email : {{ app.user.email }}</li>
+          </ul>
+    </div>
+{% endblock %}
+

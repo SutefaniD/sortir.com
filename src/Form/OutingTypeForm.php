@@ -31,7 +31,7 @@ class OutingTypeForm extends AbstractType
             ->add('registrationDeadline', DateTimeType::class,[
                 "label" => "Date limite d'inscription: "
             ])
-            ->add('maxParticipant', IntegerType::class, [
+            ->add('maxParticipants', IntegerType::class, [
                 "label" => "Nombre de places : "
             ])
             ->add('duration', IntegerType::class, [

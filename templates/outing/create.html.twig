@@ -1,26 +1,101 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Créer une sortie{% endblock %}
-
-{% block body %}
-
-    <h1>Créer une nouvelle sortie</h1>
+{% block css %}<link rel="stylesheet" href="{{ asset('css/outing.css') }}">{% endblock %}
 
 
+{% block main %}
+{#
     {{ form_start(form) }}
     {{ form_widget(form) }}
     {{ form_end(form) }}
-    <h2>Lieu</h2>
-
-
 
 
     <button class="btn btn-success">Créer la sortie</button>
     <button class="btn btn-primary">Publier</button>
     <button class="btn btn-danger">Annuler</button>
+#}
+    <h2>Créer une sortie</h2>
+<div class="outing">
+
+
+        {{ form_start(form) }}
+
+        <div style="display: flex; gap: 50px;">
+            <!-- Colonne gauche -->
+            <div style="flex: 1;">
+                <div>
+                    {{ form_label(form.name) }}
+                    {{ form_widget(form.name) }}
+                </div>
+                <div>
+                    {{ form_label(form.startingDateTime) }}
+                    {{ form_widget(form.startingDateTime) }}
+                </div>
+                <div>
+                    {{ form_label(form.registrationDeadline) }}
+                    {{ form_widget(form.registrationDeadline) }}
+                </div>
+                <div>
+                    {{ form_label(form.maxParticipants) }}
+                    {{ form_widget(form.maxParticipants) }}
+                </div>
+                <div>
+                    {{ form_label(form.duration) }} minutes
+                    {{ form_widget(form.duration) }}
+                </div>
+                <div>
+                    {{ form_label(form.outingDetails) }}
+                    {{ form_widget(form.outingDetails) }}
+                </div>
+            </div>
+
+            <!-- Colonne droite -->
+            <div style="flex: 1;">
+                <div>
+                    {{ form_label(form.site) }}
+                    {{ form_widget(form.site) }}
+                </div>
+
+                <!-- Champs imbriqués de "location" -->
+                <div>
+                    {{ form_label(form.location.city) }}
+                    {{ form_widget(form.location.city) }}
+                </div>
+                <div>
+                    {{ form_label(form.location.name) }}
+                    {{ form_widget(form.location.name) }}
+                </div>
+                <div>
+                    {{ form_label(form.location.street) }}
+                    {{ form_widget(form.location.street) }}
+                </div>
+                <div>
+                    {{ form_label(form.location.zipCode) }}
+                    {{ form_widget(form.location.zipCode) }}
+                </div>
+                <div>
+                    {{ form_label(form.location.latitude) }}
+                    {{ form_widget(form.location.latitude) }}
+                </div>
+                <div>
+                    {{ form_label(form.location.longitude) }}
+                    {{ form_widget(form.location.longitude) }}
+                </div>
+            </div>
+        </div>
+
+        <br>
+
+        <div style="display: flex; gap: 20px; justify-content: center;">
+            <button type="submit" class="btn btn-success">Enregistrer</button>
+            <button type="submit" class="btn btn-primary">Publier la sortie</button>
+            <a href="{{ path('main_home') }}" class="btn btn-danger">Annuler</a>
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+    {% endblock %}
 
 
 
-
-
-{% endblock %}

@@ -17,8 +17,10 @@ class ParticipantForm extends AbstractType
             $builder
                 ->add('lastName')
                 ->add('firstName')
+                ->add('username')
                 ->add('phone')
                 ->add('email');
+
         }
 
         if ($options['include_password']) {
