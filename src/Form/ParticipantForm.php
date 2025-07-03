@@ -3,6 +3,8 @@
 namespace App\Form;
 
 use App\Entity\Participant;
+use App\Entity\Site;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -19,7 +21,13 @@ class ParticipantForm extends AbstractType
                 ->add('firstName')
                 ->add('username')
                 ->add('phone')
-                ->add('email');
+                ->add('email')
+                ->add('site', EntityType::class, [
+                    'class' => Site::class,
+                    'choice_label' => 'name',
+                    'placeholder' => 'Choose a site',
+                    'label' => 'Attachment site'
+                ]);
         }
 
         if ($options['include_password']) {
