@@ -53,6 +53,9 @@ class Outing
     #[ORM\JoinColumn(nullable: false)]
     private ?Location $location = null;
 
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $cancelReason = null;
+
     public function __construct()
     {
         $this->participants = new ArrayCollection();
@@ -195,5 +198,15 @@ class Outing
         $this->location = $location;
 
         return $this;
+    }
+
+    public function getCancelReason(): ?string
+    {
+        return $this->cancelReason;
+    }
+
+    public function setCancelReason(?string $cancelReason): void
+    {
+        $this->cancelReason = $cancelReason;
     }
 }
