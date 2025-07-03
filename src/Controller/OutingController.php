@@ -54,29 +54,29 @@ final class OutingController extends AbstractController
         ]);
     }
 
-    #[Route('/list', name: 'list')]
-    public function list(
-        OutingRepository $outingRepository,
-        Request $request,
-    ) : Response {
-
-        $filterForm = $this->createForm(FilterForm::class);
-
-        $filterForm->handleRequest($request);
-
-        $outings = [];
-
-        if ($filterForm->isSubmitted() && $filterForm->isValid()) {
-            $filters = $filterForm->getData();
-
-            $outings = $outingRepository->findByFilter($filters);
-        }
-
-        return $this->render("outing/list.html.twig", [
-            'filterForm' => $filterForm->createView(),
-            'outings' => $outings
-        ]);
-    }
+//    #[Route('/list', name: 'list')]
+//    public function list(
+//        OutingRepository $outingRepository,
+//        Request $request,
+//    ) : Response {
+//
+//        $filterForm = $this->createForm(FilterForm::class);
+//
+//        $filterForm->handleRequest($request);
+//
+//        $outings = [];
+//
+//        if ($filterForm->isSubmitted() && $filterForm->isValid()) {
+//            $filters = $filterForm->getData();
+//
+//            $outings = $outingRepository->findByFilter($filters);
+//        }
+//
+//        return $this->render("outing/list.html.twig", [
+//            'filterForm' => $filterForm->createView(),
+//            'outings' => $outings
+//        ]);
+//    }
 
     // pour la création d'une page affichage de sortie (par id)
 
