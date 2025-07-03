@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use App\Entity\Location;
 use App\Entity\Participant;
 use App\Entity\Outing;
+use App\Entity\Site;
 use App\Entity\Status;
 use App\Enum\StatusName;
 use DateTime;
@@ -18,29 +19,45 @@ class OutingFixtures extends Fixture implements DependentFixtureInterface
     public function load(ObjectManager $manager): void
     {
         $now = new DateTime();
-        $statusOngoing = (new Status())->setLabel(StatusName::ONGOING);
-        $statusPast = (new Status())->setLabel(StatusName::PAST);
-        $manager->persist($statusOngoing);
-        $manager->persist($statusPast);
-
         $faker = Factory::create('fr_FR');
 
-        for ($i = 0; $i < 20; $i++) {
+        $statuses = [];
+        foreach(StatusName::cases() as $statusName) {
+            $statuses[$statusName->value] = $this->getReference('status_' .$statusName->value, Status::class);
+        }
+
+        for ($i = 0; $i < 50; $i++) {
             $outing = new Outing();
 
             $outing->setName($faker->sentence(3));
             $startDate = (new \DateTime())->modify(rand(-10, 10) . ' days');
             $outing->setStartingDateTime($startDate);
-            $outing->setDuration($faker->numberBetween(1, 8)); // durée en heures
+            $outing->setDuration($faker->numberBetween(30, 1440)); // durée en minutes
             $outing->setRegistrationDeadline((clone $startDate)->modify('-1 days'));
             $outing->setMaxParticipants(rand(3, 100));
             $outing->setOutingDetails($faker->text(100));
 
-            // pour le moment que 2 statuts
+            // Choix du status
+            // Si date future : à 70% ONGOING, sinon 20% CREATED, 10% CANCELLED
+            // Si date passée : à 80% PAST, sinon 20% CANCELLED
             if ($startDate > $now) {
-                $outing->setStatus($statusOngoing);
+                $rand = $faker->randomFloat(2, 0, 1);
+                if ($rand <= 0.7) {
+                    $outing->setStatus($statuses[StatusName::ONGOING->value]);
+                } else if ($rand <= 0.9) {
+                    $outing->setStatus($statuses[StatusName::CREATED->value]);
+                } else {
+                    $outing->setStatus($statuses[StatusName::CANCELLED->value]);
+                    $outing->setCancelReason($faker->sentence());
+                }
             } else {
-                $outing->setStatus($statusPast);
+                $rand = $faker->randomFloat(2, 0, 1);
+                if ($rand <= 0.8) {
+                    $outing->setStatus($statuses[StatusName::PAST->value]);
+                } else {
+                    $outing->setStatus($statuses[StatusName::CANCELLED->value]);
+                    $outing->setCancelReason($faker->sentence());
+                }
             }
 
             $organizerIndex = rand(0,19);
@@ -60,17 +77,11 @@ class OutingFixtures extends Fixture implements DependentFixtureInterface
                 $outing->addParticipant($participant);
             }
 
-
-            $outing->setRegistrationDeadline($faker->dateTimeBetween('-1 year', $startingDate)); // pas sure
-
-            $outing->setMaxParticipants($faker->randomNumber(2, false));
-            $outing->setOutingDetails($faker->text(200));
-            $outing->setStatus($statuses[array_rand($statuses)]);
-            $outing->setLocation($locations[array_rand($locations)]);
-
             $locationReference = $this->getReference('location_' . rand(0, LocationFixtures::LOCATION_COUNT - 1), Location::class);
             $outing->setLocation($locationReference);
 
+            $siteReference = $this->getReference('site_' . rand(0, count(SiteFixtures::SITE_NAMES) - 1), Site::class);
+            $outing->setSite($siteReference);
 
             $manager->persist($outing);
             $this->addReference('outing_' . $i, $outing);
@@ -84,6 +95,8 @@ class OutingFixtures extends Fixture implements DependentFixtureInterface
         return [
             ParticipantFixtures::class,
             LocationFixtures::class,
+            SiteFixtures::class,
+            StatusFixtures::class
         ];
     }
 }
