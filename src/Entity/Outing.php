@@ -74,7 +74,7 @@ class Outing
     #[Assert\NotNull(message: "Le lieu est requis.")]
     private ?Location $location = null;
 
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $cancelReason = null;
 
     #[ORM\ManyToOne(inversedBy: 'outings')]
