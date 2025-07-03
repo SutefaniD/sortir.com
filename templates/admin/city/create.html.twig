@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create city{% endblock %}
+
+{% block css %}<link rel="stylesheet" href="{{ asset('assets/css/participant.css') }}">{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <h1>Créer une ville</h1>
+        <div class="create-participant">
+            {{ form(cityForm) }}
+        </div>
+    </div>
+{% endblock %}

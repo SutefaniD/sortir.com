@@ -7,15 +7,23 @@
         <div class="button-list">
             {% if app.user %}
                 <p class="nav-button"><a href="{{ path('main_home') }}">Accueil</a></p>
-                <p class="nav-button"><a href="{{ path('outing_create') }}">Créer une sortie</a></p>
+
+                {% if app.user and app.user.administrator == true %}
+                    <p class="nav-button"><a href="{{ path('admin_all_users') }}">Participants</a></p>
+                    <p class="nav-button"><a href="{{ path('admin_city_all') }}">Cities</a></p>
+                    <p class="nav-button"><a href="{{ path('admin_site_all') }}">Sites</a></p>
+                {% endif %}
+
+                {% if app.user and app.user.administrator == false %}
+                    <p class="nav-button"><a href="{{ path('outing_create') }}">Create outing</a></p>
+                {% endif %}
+
                 <p class="nav-button">Hello {{ app.user.firstName }} !</p>
                 <img src="{{ asset('assets/images/account_circle.svg') }}" alt="" id="openProfile">
-            {% else %}
+            {% endif %}
+            {% if not app.user %}
                 <p class="nav-button"><a href="{{ path('participant_create') }}">Register</a></p>
                 <p class="nav-button"><a href="{{ path('app_login') }}">Log in</a></p>
-            {% endif %}
-            {% if app.user and app.user.administrator == true %}
-                salut
             {% endif %}
         </div>
     </nav>

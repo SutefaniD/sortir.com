@@ -15,10 +15,10 @@ class City
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 150)]
+    #[ORM\Column(length: 150, unique: true, nullable: false)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 6, nullable: true)]
+    #[ORM\Column(length: 6, nullable: false)]
     private ?string $zipCode = null;
 
     /**
