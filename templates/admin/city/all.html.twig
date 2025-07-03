@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}All cities{% endblock %}
+
+{% block css %}<link rel="stylesheet" href="{{ asset('assets/css/admin.css') }}">{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <h2>Liste des villes</h2><a href="{{ path('admin_create_city') }}">Create city</a>
+        {% for city in cities %}
+            <div class="participant-row">
+                <div class="participant-field">
+                    <span class="label">Name</span>
+                    <span class="value">{{ city.name }}</span>
+                </div>
+                <div class="participant-field">
+                    <span class="label">Zip code</span>
+                    <span class="value">{{ city.zipCode }}</span>
+                </div>
+                <div class="participant-field">
+                    <span><a href="{{ path('admin_update_city', {'id': city.id}) }}">Update</a></span>
+                    <span><a href="{{ path('admin_delete_city', {'id': city.id}) }}">Supprimer</a></span>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
