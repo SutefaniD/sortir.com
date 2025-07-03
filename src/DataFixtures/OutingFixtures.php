@@ -60,8 +60,17 @@ class OutingFixtures extends Fixture implements DependentFixtureInterface
                 $outing->addParticipant($participant);
             }
 
+
+            $outing->setRegistrationDeadline($faker->dateTimeBetween('-1 year', $startingDate)); // pas sure
+
+            $outing->setMaxParticipants($faker->randomNumber(2, false));
+            $outing->setOutingDetails($faker->text(200));
+            $outing->setStatus($statuses[array_rand($statuses)]);
+            $outing->setLocation($locations[array_rand($locations)]);
+
             $locationReference = $this->getReference('location_' . rand(0, LocationFixtures::LOCATION_COUNT - 1), Location::class);
             $outing->setLocation($locationReference);
+
 
             $manager->persist($outing);
             $this->addReference('outing_' . $i, $outing);

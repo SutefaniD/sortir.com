@@ -258,18 +258,18 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
 
-        public function getSite(): ?Site
-        {
-            return $this->site;
-        }
+    public function getSite(): ?Site
+    {
+        return $this->site;
+    }
 
-        public function setSite(?Site $site): static
-        {
-            $this->site = $site;
+    public function setSite(?Site $site): static
+    {
+        $this->site = $site;
 
-            return $this;
-        }
-
+        return $this;
+    }
+  
     public function isActive(): bool
     {
         return $this->active ?? false;

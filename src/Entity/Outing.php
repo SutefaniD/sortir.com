@@ -9,6 +9,7 @@ namespace App\Entity;
     use Doctrine\Common\Collections\Collection;
     use Doctrine\DBAL\Types\Types;
     use Doctrine\ORM\Mapping as ORM;
+    use Symfony\Component\Validator\Constraints as Assert;
 
     #[ORM\Entity(repositoryClass: OutingRepository::class)]
 class Outing
@@ -19,21 +20,38 @@ class Outing
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: false)]
+    #[Assert\NotBlank(message: "Le nom de la sortie est obligatoire.")]
+    #[Assert\Length(max: 255, maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères.")]
     private string $name;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: false)]
+    #[Assert\NotNull(message: "La date et l'heure de la sortie sont obligatoires.")]
+    #[Assert\GreaterThan("today", message: "La sortie doit être prévue dans le futur.")]
     private \DateTimeInterface $startingDateTime;
 
     #[ORM\Column(type: Types::INTEGER, nullable: false)]
+    #[Assert\NotNull(message: "La durée est obligatoire.")]
+    #[Assert\GreaterThanOrEqual(
+        value: 0,
+        message: "La durée ne peut pas être négative."
+    )]
     private int $duration;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: false)]
+    #[Assert\NotNull(message: "La date limite d'inscription est obligatoire.")]
+    #[Assert\LessThan(propertyPath: "startingDateTime", message: "La date limite doit être avant la date de la sortie.")]
     private DateTimeInterface $registrationDeadline;
 
     #[ORM\Column(type: Types::INTEGER, nullable: false)]
+    #[Assert\NotNull(message: "Le nombre de places est obligatoire.")]
+    #[Assert\GreaterThanOrEqual(
+        value: 0,
+        message: "Le nombre de participants ne peut pas être négatif."
+    )]
     private int $maxParticipants;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: "Veuillez renseigner les détails de la sortie.")]
     private ?string $outingDetails = null;
 
     /**
@@ -43,14 +61,17 @@ class Outing
     private Collection $participants;
 
     #[ORM\ManyToOne(inversedBy: 'organizedOutings')]
+    #[Assert\NotNull(message: "L'organisateur est requis.")]
     private ?Participant $organizer = null;
 
     #[ORM\ManyToOne(targetEntity: Status::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Assert\NotNull(message: "Le statut de la sortie est obligatoire.")]
     private ?Status $status = null;
 
     #[ORM\ManyToOne(inversedBy: 'outings')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message: "Le lieu est requis.")]
     private ?Location $location = null;
 
     #[ORM\Column(type: Types::TEXT)]
@@ -58,6 +79,7 @@ class Outing
 
     #[ORM\ManyToOne(inversedBy: 'outings')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message: "Le site est obligatoire.")]
     private ?Site $site = null;
 
     public function __construct()
