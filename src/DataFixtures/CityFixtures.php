@@ -22,7 +22,6 @@ class CityFixtures extends Fixture
 
             $manager->persist($city);
 
-            // On garde la référence pour LocationFixtures
             $this->addReference('city_' . $i, $city);
         }
 

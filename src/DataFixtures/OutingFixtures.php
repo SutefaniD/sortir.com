@@ -2,6 +2,8 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Location;
+use App\Entity\Participant;
 use App\Entity\Outing;
 use App\Entity\Status;
 use App\Enum\StatusName;
@@ -42,7 +44,7 @@ class OutingFixtures extends Fixture implements DependentFixtureInterface
             }
 
             $organizerIndex = rand(0,19);
-            $organizer = $this->getReference('participant_' . $organizerIndex, ParticipantFixtures::class);
+            $organizer = $this->getReference('participant_' . $organizerIndex, Participant::class);
             $outing->setOrganizer($organizer);
 
             $possibleParticipants = range(0, 19);
@@ -54,11 +56,11 @@ class OutingFixtures extends Fixture implements DependentFixtureInterface
             $participantsIndex = (array)array_rand($possibleParticipants, $participantsRegistered);
 
             foreach ($participantsIndex as $index) {
-                $participant = $this->getReference('participant_' . $possibleParticipants[$index], ParticipantFixtures::class);
+                $participant = $this->getReference('participant_' . $possibleParticipants[$index], Participant::class);
                 $outing->addParticipant($participant);
             }
 
-            $locationReference = $this->getReference('location_' . rand(0, LocationFixtures::LOCATION_COUNT - 1), LocationFixtures::class);
+            $locationReference = $this->getReference('location_' . rand(0, LocationFixtures::LOCATION_COUNT - 1), Location::class);
             $outing->setLocation($locationReference);
 
             $manager->persist($outing);
