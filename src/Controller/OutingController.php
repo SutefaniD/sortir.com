@@ -34,11 +34,16 @@ class OutingController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+                // Si le statut n'est pas rempli par le formulaire, on l'assigne ici
+                if (!$outing->getStatus()) {
+                    $outing->setStatus($statusRepo->findOneBy(['label' => 'created']));
+                }
+
             $em->persist($outing);
             $em->flush();
-
             $this->addFlash('success', 'Sortie créée avec succès !');
-            return $this->redirectToRoute('outing_show', ['id' => $outing->getId()]);
+            return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
         }
 
         return $this->render('outing/create.html.twig', [
@@ -48,16 +53,16 @@ class OutingController extends AbstractController
 
     // pour la création d'une page affichage de sortie (par id)
 
-    #[Route('/outing/{id}', name: 'outing_detail', requirements: ['id' => '\d+'])]
-    public function show(int $id, OutingRepository $outingRepo): Response
+    #[Route('/outing/detail/{id}', name: 'outing_detail', requirements: ['id' => '\d+'])]
+    public function detail(int $id, OutingRepository $outingRepo): Response
     {
-        $outing = $outingRepo->findFullOuting($id);
+        $outing = $outingRepo->findOneBy($id);
 
         if (!$outing) {
             throw $this->createNotFoundException('Sortie non trouvée');
         }
 
-        return $this->render('outing/show.html.twig', [
+        return $this->render('outing/detail.html.twig', [
             'outing' => $outing,
             'now' => new \DateTime()
         ]);
@@ -75,11 +80,14 @@ class OutingController extends AbstractController
         $now = new \DateTime();
 
         // Récupération avec filtres
+        //pour tester pour instant
+        $outings = $outingRepo->findAll();
+        /* code pour remplacer test du haut
         $outings = $outingRepo->findAllWithFilters(
             $user->getId(),
             $siteFilter
         );
-
+*/
         return $this->render('outing/list.html.twig', [
             'outings' => $outings,
             'now' => $now
@@ -110,86 +118,79 @@ class OutingController extends AbstractController
         ]);
     }
 
+    //pour l'annulation
 
-}
-
-
-/*
-
-namespace App\Controller;
-
-use App\Entity\Outing;
-use App\Form\OutingTypeForm;
-use App\Repository\OutingRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\ParticipantRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
-
-
-#[Route('/outing')]
-final class OutingController extends AbstractController
-{
-    #[Route('/create', name: 'outing_create')]
-    public function create(
-        Request                $request,
+    #[Route('/outing/cancel/{id}', name: 'outing_cancel', requirements: ['id' => '\d+'])]
+    #[IsGranted('CANCEL', subject: 'outing')]
+    public function cancel(
+        Outing $outing,
+        Request $request,
         EntityManagerInterface $em,
-        ParticipantRepository  $participantRepo,
-        Security $security
-    ): Response
-    {
-        $user = $security->getUser();
-
-        // Vérifie que l'utilisateur est connecté et a le rôle adéquat
-        if (!$this->isGranted('ROLE_ORGANIZER') && !$this->isGranted('ROLE_ADMIN')
-            && !$this->isGranted('ROLE_USER')) //pour travailler - ACCES!!!!!!!!!!!
-            ///////////////////////////////////////A CHANGER ///////////////////////////
-        {
-            throw $this->createAccessDeniedException('Accès refusé.');
-        }
-
-        $outing = new Outing();
-        $outing->setOrganizer($user); // Assigne automatiquement l’organisateur
-
-        $form = $this->createForm(OutingTypeForm::class, $outing);
+        StatusRepository $statusRepo
+    ): Response {
+        $form = $this->createForm(CancelOutingType::class);
         $form->handleRequest($request);
 
-
         if ($form->isSubmitted() && $form->isValid()) {
+            $outing->setCancellationReason($form->get('reason')->getData());
+            $outing->setStatus($statusRepo->findOneBy(['name' => 'cancelled']));
 
-            // Organisateur = utilisateur courant
-            $outing->setOrganizer($this->getUser());
-
-            // Récupération du repo Status
-            $statusRepo = $em->getRepository(Status::class);
-
-            if ($form->get('save')->isClicked()) {
-                $outing->setStatus($statusRepo->findOneBy(['label' => StatusName::CREATED]));
-                $em->persist($outing);
-                $em->flush();
-
-                return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
-            }
-
-            if ($form->get('publish')->isClicked()) {
-                $outing->setStatus($statusRepo->findOneBy(['label' => StatusName::ONGOING]));
-                $em->persist($outing);
-                $em->flush();
-
-                return $this->redirectToRoute('/list.html.twig');
-            }
-
-            if ($form->get('cancel')->isClicked()) {
-                return $this->redirectToRoute('home');
-            }
+            $em->flush();
+            $this->addFlash('success', 'Sortie annulée avec succès');
+            return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
         }
 
-        return $this->render('/create.html.twig', [
+        return $this->render('outing/cancel.html.twig', [
             'form' => $form->createView(),
+            'outing' => $outing
         ]);
     }
-}
+    /*
+    #[Route('/outing/register/{id}', name: 'outing_register', requirements: ['id' => '\d+'])]
+    public function register(
+        Outing $outing,
+        EntityManagerInterface $em
+    ): Response {
+        $user = $this->getUser();
+        $now = new \DateTime();
+
+        // Vérifications
+        if ($outing->getRegistrationDeadline() < $now) {
+            $this->addFlash('error', 'La date limite d\'inscription est dépassée');
+        } elseif ($outing->getParticipants()->count() >= $outing->getMaxParticipants()) {
+            $this->addFlash('error', 'Le nombre maximum de participants est atteint');
+        } elseif ($outing->getParticipants()->contains($user)) {
+            $this->addFlash('warning', 'Vous êtes déjà inscrit à cette sortie');
+        } else {
+            $outing->addParticipant($user);
+            $em->flush();
+            $this->addFlash('success', 'Inscription réussie !');
+        }
+
+        return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
+    }
+
+    #[Route('/outing/unregister/{id}', name: 'outing_unregister', requirements: ['id' => '\d+'])]
+    public function unregister(
+        Outing $outing,
+        EntityManagerInterface $em
+    ): Response {
+        $user = $this->getUser();
+        $now = new \DateTime();
+
+        if ($outing->getStartingDateTime() < $now) {
+            $this->addFlash('error', 'La sortie a déjà commencé');
+        } elseif (!$outing->getParticipants()->contains($user)) {
+            $this->addFlash('error', 'Vous n\'êtes pas inscrit à cette sortie');
+        } else {
+            $outing->removeParticipant($user);
+            $em->flush();
+            $this->addFlash('success', 'Désinscription effectuée');
+        }
+
+        return $this->redirectToRoute('outing_show', ['id' => $outing->getId()]);
+    }
 */
+
+}
+

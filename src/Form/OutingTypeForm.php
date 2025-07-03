@@ -50,23 +50,7 @@ class OutingTypeForm extends AbstractType
             ->add('location', LocationForm::class, [
                 'label' => false // formulaire imbriqué, labels gérés à l’intérieur
             ]);
-            /*
-             * ->add('location', EntityType::class, [
-                'class' => Location::class,
-                'choice_label' => 'name', // La propriété de Location
-                'label' => 'Lieu enregistré :'
-            ])
-            ->add('status', EntityType::class, [
-                'class' => Status::class,
-                'choice_label' => 'Etat',
-            ])
-            ->add('participants', EntityType::class, [
-                'class' => Participant::class,
-                'choice_label' => 'email', // ou autre
-                'multiple' => true,
-                'expanded' => true,
-                'required' => false,
-            ])*/
+
 
 
     }

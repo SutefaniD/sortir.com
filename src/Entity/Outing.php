@@ -65,7 +65,7 @@ class Outing
     private ?Participant $organizer = null;
 
     #[ORM\ManyToOne(targetEntity: Status::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Assert\NotNull(message: "Le statut de la sortie est obligatoire.")]
     private ?Status $status = null;
 

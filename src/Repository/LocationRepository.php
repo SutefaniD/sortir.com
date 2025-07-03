@@ -16,6 +16,31 @@ class LocationRepository extends ServiceEntityRepository
         parent::__construct($registry, Location::class);
     }
 
+    /**
+    //     * @return Location[] Returns an array of Location objects
+    //     */
+    public function findAllWithFilters(?int $userId, ?string $siteFilter): array
+    {
+        $qb = $this->createQueryBuilder('o')
+            ->leftJoin('o.site', 's')
+            ->addSelect('s');
+
+        if ($siteFilter) {
+            $qb->andWhere('s.id = :siteId')
+                ->setParameter('siteId', $siteFilter);
+        }
+
+        if ($userId) {
+            $qb->leftJoin('o.participants', 'p')
+                ->addSelect('p');
+            // Tu peux ajouter d'autres conditions si nécessaire, comme :
+            // $qb->andWhere('p.id = :userId')
+            //    ->setParameter('userId', $userId);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
     //    /**
     //     * @return Location[] Returns an array of Location objects
     //     */
