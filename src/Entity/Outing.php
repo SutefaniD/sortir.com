@@ -56,6 +56,10 @@ class Outing
     #[ORM\Column(type: Types::TEXT)]
     private ?string $cancelReason = null;
 
+    #[ORM\ManyToOne(inversedBy: 'outings')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Site $site = null;
+
     public function __construct()
     {
         $this->participants = new ArrayCollection();
@@ -208,5 +212,15 @@ class Outing
     public function setCancelReason(?string $cancelReason): void
     {
         $this->cancelReason = $cancelReason;
+    }
+
+    public function getSite(): ?Site
+    {
+        return $this->site;
+    }
+
+    public function setSite(?Site $site): void
+    {
+        $this->site = $site;
     }
 }
