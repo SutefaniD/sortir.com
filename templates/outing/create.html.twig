@@ -9,6 +9,16 @@
     <h2>Créer une sortie</h2>
 <div class="outing">
 
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label == 'error' ? 'danger' : 'success' }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+
+
 
         {{ form_start(form) }}
 

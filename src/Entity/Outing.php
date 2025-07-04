@@ -26,7 +26,7 @@ class Outing
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: false)]
     #[Assert\NotNull(message: "La date et l'heure de la sortie sont obligatoires.")]
-    #[Assert\GreaterThan("today", message: "La sortie doit être prévue dans le futur.")]
+    #[Assert\GreaterThan("now", message: "La sortie doit être prévue dans le futur.")]
     private \DateTimeInterface $startingDateTime;
 
     #[ORM\Column(type: Types::INTEGER, nullable: false)]
@@ -64,7 +64,7 @@ class Outing
     #[Assert\NotNull(message: "L'organisateur est requis.")]
     private ?Participant $organizer = null;
 
-    #[ORM\ManyToOne(targetEntity: Status::class)]
+    #[ORM\ManyToOne(targetEntity: Status::class, inversedBy: "outings")]
     #[ORM\JoinColumn(nullable: true)]
     #[Assert\NotNull(message: "Le statut de la sortie est obligatoire.")]
     private ?Status $status = null;

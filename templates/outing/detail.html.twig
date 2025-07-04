@@ -10,7 +10,7 @@
     <p>Nombre maximum de participants : {{ outing.maxParticipants }}</p>
     <p>Durée : {{ outing.duration }} minutes</p>
     <p>Détails : {{ outing.outingDetails }}</p>
-    <p>Site et localisation</p>
+
     <p>Site : {{ outing.site }}</p>
     <p>Ville : {{ outing.location.city }}</p>
     <p>Nom du lieu : {{ outing.location.name }}</p>
@@ -19,15 +19,20 @@
     <p>Latitude : {{ outing.location.latitude }}</p>
     <p>Longitude : {{ outing.location.longitude }}</p>
 
-    {% if is_granted('CANCEL', outing) and outing.status.name != 'cancelled' %}
-        <a href="{{ path('outing_cancel', {'id': outing.id}) }}" class="btn btn-danger">Annuler</a>
+{# Affichage conditionnel des actions #}
+{% if user %}
+    {% if user == outing.organizer and outing.status.label in ['Créée', 'Ouverte'] %}
+        <a href="{{ path('outing_cancel', {id: outing.id}) }}"class="btn btn-danger">Annuler la sortie</a>
     {% endif %}
 
-    {% if app.user in outing.participants %}
-        <a href="{{ path('outing_unregister', {'id': outing.id}) }}" class="btn btn-warning">Se désister</a>
-    {% elseif outing.status.name == 'open' and outing.participants|length < outing.maxParticipants %}
-        <a href="{{ path('outing_register', {'id': outing.id}) }}" class="btn btn-success">S'inscrire</a>
+    {% if user != outing.organizer %}
+        {% if outing.status.label == 'Ouverte' and outing.registrationDeadline > now %}
+            {% if not outing.participants.contains(user) %}
+                <a href="{{ path('outing_subscribe', {id: outing.id}) }}" class="btn btn-success">S'inscrire</a>
+            {% else %}
+                <a href="{{ path('outing_unsubscribe', {id: outing.id}) }}">Se désister</a>
+            {% endif %}
+        {% endif %}
     {% endif %}
-
-{% endblock %}
+{% endif %}
 

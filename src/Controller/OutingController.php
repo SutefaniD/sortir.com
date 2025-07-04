@@ -11,6 +11,7 @@ use App\Repository\StatusRepository;
 use App\Repository\ParticipantRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -27,32 +28,57 @@ final class OutingController extends AbstractController
         StatusRepository       $statusRepo
     ): Response
     {
-        $outing = new Outing();
         $user = $this->getUser();
 
+        if (!$user) {
+            throw $this->createAccessDeniedException("User is not logged in");
+        }
+
+        $outing = new Outing();
         $outing->setOrganizer($user);
-        $outing->setStatus($statusRepo->findOneBy(['label' => 'created']));
+        //$outing->setStatus($statusRepo->findOneBy(['label' => 'created']));
 
         $form = $this->createForm(OutingTypeForm::class, $outing);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            try {
                 // Si le statut n'est pas rempli par le formulaire, on l'assigne ici
-                if (!$outing->getStatus()) {
+                /*if (!$outing->getStatus()) {
                     $outing->setStatus($statusRepo->findOneBy(['label' => 'created']));
                 }
+                */
 
-            $em->persist($outing);
-            $em->flush();
-            $this->addFlash('success', 'Sortie créée avec succès !');
-            return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
+                // Définir le statut selon le bouton cliqué
+                /*
+                if ($form->get('publish')->isClicked()) {
+                    $outing->setStatus($statusRepo->findOneBy(['label' => 'Ongoing']));
+                } else {
+                    $outing->setStatus($statusRepo->findOneBy(['label' => 'Created']));
+                }
+                //    $outing->setstartingDateTime(new \DateTime());
+                  //  $outing->registrationDeadline(new \DateTime());
+*/
+                $outing->setStatus($statusRepo->findOneBy(['label' => 'Created']));
+
+                $em->persist($outing);
+                $em->flush();
+                $this->addFlash('success', 'Sortie créée avec succès !');
+                return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
+
+                }
+                catch (Exception $exception) {
+                $this->addFlash('warning', $exception->getMessage());
+            }}
+
+            return $this->render('outing/create.html.twig', [
+                'form' => $form
+                //'form' => $form->createView(),
+
+            ]);
         }
 
-        return $this->render('outing/create.html.twig', [
-            'form' => $form->createView(),
-        ]);
-    }
 
 //    #[Route('/list', name: 'list')]
 //    public function list(
@@ -80,7 +106,7 @@ final class OutingController extends AbstractController
 
     // pour la création d'une page affichage de sortie (par id)
 
-    #[Route('/outing/detail/{id}', name: 'outing_detail', requirements: ['id' => '\d+'])]
+    #[Route('/detail/{id}', name: 'detail', requirements: ['id' => '\d+'])]
     public function detail(int $id, OutingRepository $outingRepo): Response
     {
         $outing = $outingRepo->findOneBy($id);
@@ -97,7 +123,7 @@ final class OutingController extends AbstractController
 
 
 // pour création d'une page Liste de Sorties (lecture)
-    #[Route('/outing/list', name: 'outing_list')]
+    #[Route('/list', name: 'list')]
     public function list(
         OutingRepository $outingRepo,
         Request $request
@@ -123,7 +149,7 @@ final class OutingController extends AbstractController
 
     // pour la modification de Sortie
 
-    #[Route('/outing/edit/{id}', name: 'outing_edit', requirements: ['id' => '\d+'])]
+    #[Route('/edit/{id}', name: 'outing_edit', requirements: ['id' => '\d+'])]
     #[IsGranted('EDIT', subject: 'outing')]
     public function edit(
         Outing $outing,
@@ -147,29 +173,45 @@ final class OutingController extends AbstractController
 
     //pour l'annulation
 
-    #[Route('/outing/cancel/{id}', name: 'outing_cancel', requirements: ['id' => '\d+'])]
+    #[Route('/cancel/{id}', name: 'cancel', requirements: ['id' => '\d+'])]
     #[IsGranted('CANCEL', subject: 'outing')]
+
     public function cancel(
         Outing $outing,
         Request $request,
+        Security $security,
         EntityManagerInterface $em,
         StatusRepository $statusRepo
     ): Response {
-        $form = $this->createForm(CancelOutingType::class);
-        $form->handleRequest($request);
+        $user = $security->getUser();
 
+        if ($outing->getOrganizer() !== $user) {
+            throw $this->createAccessDeniedException("Vous n'êtes pas l'organisateur");
+        }
+
+        if ($outing->getStartingDateTime() <= new \DateTime()) {
+            throw $this->createAccessDeniedException("Sortie déjà commencée");
+        }
+
+        $form = $this->createFormBuilder()
+            ->add('cancelReason', TextareaType::class, ['label' => 'Motif d’annulation'])
+            ->add('submit', SubmitType::class, ['label' => 'Annuler la sortie'])
+            ->getForm();
+
+        $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $outing->setCancellationReason($form->get('reason')->getData());
-            $outing->setStatus($statusRepo->findOneBy(['name' => 'cancelled']));
+            $data = $form->getData();
+            $outing->setCancelReason($data['cancelReason']);
+            $outing->setStatus($statusRepo->findOneBy(['label' => 'Annulée']));
 
             $em->flush();
-            $this->addFlash('success', 'Sortie annulée avec succès');
-            return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
+            $this->addFlash('info', 'Sortie annulée avec succès');
+            return $this->redirectToRoute('outing_list');
         }
 
         return $this->render('outing/cancel.html.twig', [
             'form' => $form->createView(),
-            'outing' => $outing
+            'outing' => $outing,
         ]);
     }
     /*
