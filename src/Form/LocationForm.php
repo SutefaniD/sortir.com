@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\City;
 use App\Entity\Location;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -20,29 +21,31 @@ class LocationForm extends AbstractType
              //   'label' => 'ID du lieu'
             //])
             ->add('name', TextType::class, [
-                'label' => 'Nom du lieu'
+                'label' => 'Nom du lieu',
+                   'attr' => [
+                       'autofocus' => true,
+                   ]
             ])
             ->add('city', EntityType::class, [
                 'class' => City::class,
                 'choice_label' => 'name',
                 'label' => 'Ville'
             ])
-
-
             ->add('street', TextType::class, [
                 'label' => 'Rue'
             ])
-            ->add('zipCode', TextType::class, [
-                'label' => 'Code postal',
-                'mapped' => false,
-                'disabled' => false,
-            ])
+//            ->add('zipCode', TextType::class, [
+//                'label' => 'Code postal',
+//                'mapped' => false,
+//                'disabled' => false,
+//            ])
             ->add('latitude', TextType::class, [
                 'label' => 'Latitude'
             ])
             ->add('longitude', TextType::class, [
                 'label' => 'Longitude'
-            ]);
+            ])
+            ->add('submit', SubmitType::class);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

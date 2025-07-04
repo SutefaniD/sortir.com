@@ -13,7 +13,11 @@ class CityForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name')
+            ->add('name', null, [
+                'attr' => [
+                    'autofocus' => true,
+                ]
+            ])
             ->add('zipCode')
             ->add('submit', SubmitType::class)
         ;

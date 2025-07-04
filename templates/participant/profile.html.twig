@@ -2,12 +2,12 @@
     <h2>Mon profil</h2>
     <img src="{{ asset('assets/images/close.svg') }}" alt="" id="closeProfile">
     <ul>
-        <li>Last name : {{ app.user.lastName }}</li>
-        <li>First name : {{ app.user.firstName }}</li>
-        <li>Username : {{ app.user.username }}</li>
-        <li>Phone : {{ app.user.phone }}</li>
+        <li>Nom : {{ app.user.lastName }}</li>
+        <li>Prénom : {{ app.user.firstName }}</li>
+        <li>Pseudo : {{ app.user.username }}</li>
+        <li>Téléphone : {{ app.user.phone }}</li>
         <li>Email : {{ app.user.email }}</li>
-        <li>Attachment site : {{ app.user.site.name }}</li>
+        <li>Site de rattachement : {{ app.user.site.name }}</li>
     </ul>
 
     <a href="{{ path('app_logout') }}" class="drawer-button">Se deconnecter</a>

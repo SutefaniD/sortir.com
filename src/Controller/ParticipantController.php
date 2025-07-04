@@ -135,4 +135,15 @@ final class ParticipantController extends AbstractController
 
         return $this->redirectToRoute('main_home');
     }
+
+    #[Route('/profile/{id}', name: 'show_profile', methods: ['GET'])]
+    public function showProfile(int $id, EntityManagerInterface $entityManager, ParticipantRepository $participantRepository, TokenStorageInterface $tokenStorage, Request $request): Response {
+        $user = $participantRepository->find($id);
+
+        if ($user) {
+            return $this->render('participant/show_profile.html.twig', ['user' => $user]);
+        }
+
+        return $this->redirectToRoute('main_home');
+    }
 }
