@@ -11,28 +11,30 @@
     <p>Durée : {{ outing.duration }} minutes</p>
     <p>Détails : {{ outing.outingDetails }}</p>
 
-    <p>Site : {{ outing.site }}</p>
-    <p>Ville : {{ outing.location.city }}</p>
+    <p>Site : {{ outing.site.name }}</p>
+    <p>Ville : {{ outing.location.city.name }}</p>
     <p>Nom du lieu : {{ outing.location.name }}</p>
     <p>Rue : {{ outing.location.street }}</p>
-    <p>Code postal : {{ outing.location.zipCode }}</p>
+{#    <p>Code postal : {{ outing.location.zipCode }}</p>#}
     <p>Latitude : {{ outing.location.latitude }}</p>
     <p>Longitude : {{ outing.location.longitude }}</p>
 
-{# Affichage conditionnel des actions #}
-{% if user %}
-    {% if user == outing.organizer and outing.status.label in ['Créée', 'Ouverte'] %}
-        <a href="{{ path('outing_cancel', {id: outing.id}) }}"class="btn btn-danger">Annuler la sortie</a>
-    {% endif %}
+    {# Affichage conditionnel des actions #}
+    {% if app.user %}
+        {% if app.user == outing.organizer and outing.status.label in ['Créée', 'Ouverte'] %}
+            <a href="{{ path('outing_cancel', {id: outing.id}) }}"class="btn btn-danger">Annuler la sortie</a>
+        {% endif %}
 
-    {% if user != outing.organizer %}
-        {% if outing.status.label == 'Ouverte' and outing.registrationDeadline > now %}
-            {% if not outing.participants.contains(user) %}
-                <a href="{{ path('outing_subscribe', {id: outing.id}) }}" class="btn btn-success">S'inscrire</a>
-            {% else %}
-                <a href="{{ path('outing_unsubscribe', {id: outing.id}) }}">Se désister</a>
+        {% if app.user != outing.organizer %}
+            {% if outing.status.label == 'Ouverte' and outing.registrationDeadline > now %}
+                {% if not outing.participants.contains(user) %}
+                    <a href="{{ path('outing_subscribe', {id: outing.id}) }}" class="btn btn-success">S'inscrire</a>
+                {% else %}
+                    <a href="{{ path('outing_unsubscribe', {id: outing.id}) }}">Se désister</a>
+                {% endif %}
             {% endif %}
         {% endif %}
     {% endif %}
-{% endif %}
+{% endblock %}
+
 

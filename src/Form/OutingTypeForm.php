@@ -40,16 +40,21 @@ class OutingTypeForm extends AbstractType
             ->add('outingDetails', TextareaType::class, [
                 "label" => "Déscription et info : "
             ])
-
-            ->add('site', EntityType::class, [
-                'class' => Site::class,
+            ->add('location', EntityType::class, [
+                'class' => Location::class,
                 'choice_label' => 'name',
-                'label' => 'Site :'
-            ])
-
-            ->add('location', LocationForm::class, [
-                'label' => false // formulaire imbriqué, labels gérés à l’intérieur
+                'label' => 'Lieux :'
             ]);
+//            ->add('site', EntityType::class, [
+//                'class' => Site::class,
+//                'choice_label' => 'name',
+//                'label' => 'Site :'
+//            ]);
+
+
+//            ->add('location', LocationForm::class, [
+//                'label' => false // formulaire imbriqué, labels gérés à l’intérieur
+//            ]);
 
 
 

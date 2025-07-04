@@ -12,6 +12,8 @@ use App\Repository\ParticipantRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -38,6 +40,11 @@ final class OutingController extends AbstractController
         $outing->setOrganizer($user);
         //$outing->setStatus($statusRepo->findOneBy(['label' => 'created']));
 
+        if (!$user->getSite()) {
+            throw new \LogicException("L'utilisateur n'a pas de site associé.");
+        }
+        $outing->setSite($outing->getOrganizer()->getSite());
+
         $form = $this->createForm(OutingTypeForm::class, $outing);
         $form->handleRequest($request);
 
@@ -60,16 +67,17 @@ final class OutingController extends AbstractController
                 //    $outing->setstartingDateTime(new \DateTime());
                   //  $outing->registrationDeadline(new \DateTime());
 */
-                $outing->setStatus($statusRepo->findOneBy(['label' => 'Created']));
+                $outing->setStatus($statusRepo->findOneBy(['label' => 'Créée']));
 
                 $em->persist($outing);
                 $em->flush();
                 $this->addFlash('success', 'Sortie créée avec succès !');
+
                 return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
 
                 }
                 catch (Exception $exception) {
-                $this->addFlash('warning', $exception->getMessage());
+                    $this->addFlash('warning', $exception->getMessage());
             }}
 
             return $this->render('outing/create.html.twig', [
@@ -109,7 +117,7 @@ final class OutingController extends AbstractController
     #[Route('/detail/{id}', name: 'detail', requirements: ['id' => '\d+'])]
     public function detail(int $id, OutingRepository $outingRepo): Response
     {
-        $outing = $outingRepo->findOneBy($id);
+        $outing = $outingRepo->find($id);
 
         if (!$outing) {
             throw $this->createNotFoundException('Sortie non trouvée');
