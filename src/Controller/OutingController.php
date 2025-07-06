@@ -4,11 +4,10 @@
 namespace App\Controller;
 
 use App\Entity\Outing;
-use App\Form\FilterForm;
 use App\Form\OutingTypeForm;
+use App\Form\SearchForm;
 use App\Repository\OutingRepository;
 use App\Repository\StatusRepository;
-use App\Repository\ParticipantRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -54,33 +53,10 @@ final class OutingController extends AbstractController
         ]);
     }
 
-//    #[Route('/list', name: 'list')]
-//    public function list(
-//        OutingRepository $outingRepository,
-//        Request $request,
-//    ) : Response {
-//
-//        $filterForm = $this->createForm(FilterForm::class);
-//
-//        $filterForm->handleRequest($request);
-//
-//        $outings = [];
-//
-//        if ($filterForm->isSubmitted() && $filterForm->isValid()) {
-//            $filters = $filterForm->getData();
-//
-//            $outings = $outingRepository->findByFilter($filters);
-//        }
-//
-//        return $this->render("outing/list.html.twig", [
-//            'filterForm' => $filterForm->createView(),
-//            'outings' => $outings
-//        ]);
-//    }
 
     // pour la création d'une page affichage de sortie (par id)
 
-    #[Route('/outing/detail/{id}', name: 'outing_detail', requirements: ['id' => '\d+'])]
+    #[Route('/detail/{id}', name: 'detail', requirements: ['id' => '\d+'])]
     public function detail(int $id, OutingRepository $outingRepo): Response
     {
         $outing = $outingRepo->findOneBy($id);
@@ -97,7 +73,7 @@ final class OutingController extends AbstractController
 
 
 // pour création d'une page Liste de Sorties (lecture)
-    #[Route('/outing/list', name: 'outing_list')]
+    #[Route('/list', name: 'list')]
     public function list(
         OutingRepository $outingRepo,
         Request $request
@@ -123,7 +99,7 @@ final class OutingController extends AbstractController
 
     // pour la modification de Sortie
 
-    #[Route('/outing/edit/{id}', name: 'outing_edit', requirements: ['id' => '\d+'])]
+    #[Route('/edit/{id}', name: 'edit', requirements: ['id' => '\d+'])]
     #[IsGranted('EDIT', subject: 'outing')]
     public function edit(
         Outing $outing,
@@ -147,7 +123,7 @@ final class OutingController extends AbstractController
 
     //pour l'annulation
 
-    #[Route('/outing/cancel/{id}', name: 'outing_cancel', requirements: ['id' => '\d+'])]
+    #[Route('/cancel/{id}', name: 'cancel', requirements: ['id' => '\d+'])]
     #[IsGranted('CANCEL', subject: 'outing')]
     public function cancel(
         Outing $outing,
@@ -173,7 +149,7 @@ final class OutingController extends AbstractController
         ]);
     }
     /*
-    #[Route('/outing/register/{id}', name: 'outing_register', requirements: ['id' => '\d+'])]
+    #[Route('/register/{id}', name: 'register', requirements: ['id' => '\d+'])]
     public function register(
         Outing $outing,
         EntityManagerInterface $em
@@ -197,7 +173,7 @@ final class OutingController extends AbstractController
         return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
     }
 
-    #[Route('/outing/unregister/{id}', name: 'outing_unregister', requirements: ['id' => '\d+'])]
+    #[Route('/unregister/{id}', name: 'unregister', requirements: ['id' => '\d+'])]
     public function unregister(
         Outing $outing,
         EntityManagerInterface $em
