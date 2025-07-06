@@ -2,16 +2,16 @@
 
 namespace App\Entity;
 
-    use App\Repository\OutingRepository;
-    use DateTime;
-    use DateTimeInterface;
-    use Doctrine\Common\Collections\ArrayCollection;
-    use Doctrine\Common\Collections\Collection;
-    use Doctrine\DBAL\Types\Types;
-    use Doctrine\ORM\Mapping as ORM;
-    use Symfony\Component\Validator\Constraints as Assert;
+use App\Repository\OutingRepository;
+use DateTime;
+use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
-    #[ORM\Entity(repositoryClass: OutingRepository::class)]
+#[ORM\Entity(repositoryClass: OutingRepository::class)]
 class Outing
 {
     #[ORM\Id]
@@ -22,12 +22,12 @@ class Outing
     #[ORM\Column(length: 255, nullable: false)]
     #[Assert\NotBlank(message: "Le nom de la sortie est obligatoire.")]
     #[Assert\Length(max: 255, maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères.")]
-    private string $name;
+    private ?string $name = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: false)]
     #[Assert\NotNull(message: "La date et l'heure de la sortie sont obligatoires.")]
-    #[Assert\GreaterThan("today", message: "La sortie doit être prévue dans le futur.")]
-    private \DateTimeInterface $startingDateTime;
+    #[Assert\GreaterThan("now", message: "La sortie doit être prévue dans le futur.")]
+    private ?\DateTimeInterface $startingDateTime = null;
 
     #[ORM\Column(type: Types::INTEGER, nullable: false)]
     #[Assert\NotNull(message: "La durée est obligatoire.")]
@@ -35,12 +35,12 @@ class Outing
         value: 0,
         message: "La durée ne peut pas être négative."
     )]
-    private int $duration;
+    private ?int $duration = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: false)]
     #[Assert\NotNull(message: "La date limite d'inscription est obligatoire.")]
     #[Assert\LessThan(propertyPath: "startingDateTime", message: "La date limite doit être avant la date de la sortie.")]
-    private DateTimeInterface $registrationDeadline;
+    private ?\DateTimeInterface $registrationDeadline = null;
 
     #[ORM\Column(type: Types::INTEGER, nullable: false)]
     #[Assert\NotNull(message: "Le nombre de places est obligatoire.")]
@@ -48,9 +48,9 @@ class Outing
         value: 0,
         message: "Le nombre de participants ne peut pas être négatif."
     )]
-    private int $maxParticipants;
+    private ?int $maxParticipants = null;
 
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(type: Types::TEXT, nullable: false)]
     #[Assert\NotBlank(message: "Veuillez renseigner les détails de la sortie.")]
     private ?string $outingDetails = null;
 
@@ -60,16 +60,17 @@ class Outing
     #[ORM\ManyToMany(targetEntity: Participant::class, inversedBy: 'registeredOutings')]
     private Collection $participants;
 
-    #[ORM\ManyToOne(inversedBy: 'organizedOutings')]
+    #[ORM\ManyToOne(targetEntity: Participant::class, inversedBy: 'organizedOutings')]
+    #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotNull(message: "L'organisateur est requis.")]
     private ?Participant $organizer = null;
 
-    #[ORM\ManyToOne(targetEntity: Status::class)]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\ManyToOne(targetEntity: Status::class, inversedBy: "outings")]
+    #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotNull(message: "Le statut de la sortie est obligatoire.")]
     private ?Status $status = null;
 
-    #[ORM\ManyToOne(inversedBy: 'outings')]
+    #[ORM\ManyToOne(targetEntity: Location::class, inversedBy: 'outings')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotNull(message: "Le lieu est requis.")]
     private ?Location $location = null;
@@ -77,7 +78,7 @@ class Outing
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $cancelReason = null;
 
-    #[ORM\ManyToOne(inversedBy: 'outings')]
+    #[ORM\ManyToOne(targetEntity: Site::class, inversedBy: 'outings')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotNull(message: "Le site est obligatoire.")]
     private ?Site $site = null;
@@ -92,60 +93,60 @@ class Outing
         return $this->id;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function setName(string $name): static
+    public function setName(?string $name): static
     {
         $this->name = $name;
 
         return $this;
     }
 
-    public function getStartingDateTime(): DateTimeInterface
+    public function getStartingDateTime(): ?DateTimeInterface
     {
         return $this->startingDateTime;
     }
 
-    public function setStartingDateTime(DateTimeInterface $startingDateTime): static
+    public function setStartingDateTime(?DateTimeInterface $startingDateTime): static
     {
         $this->startingDateTime = $startingDateTime;
 
         return $this;
     }
 
-    public function getDuration(): int
+    public function getDuration(): ?int
     {
         return $this->duration;
     }
 
-    public function setDuration(int $duration): static
+    public function setDuration(?int $duration): static
     {
         $this->duration = $duration;
 
         return $this;
     }
 
-    public function getRegistrationDeadline(): DateTimeInterface
+    public function getRegistrationDeadline(): ?DateTimeInterface
     {
         return $this->registrationDeadline;
     }
 
-    public function setRegistrationDeadline(DateTimeInterface $registrationDeadline): static
+    public function setRegistrationDeadline(?DateTimeInterface $registrationDeadline): static
     {
         $this->registrationDeadline = $registrationDeadline;
 
         return $this;
     }
 
-    public function getMaxParticipants(): int
+    public function getMaxParticipants(): ?int
     {
         return $this->maxParticipants;
     }
 
-    public function setMaxParticipants(int $maxParticipants): static
+    public function setMaxParticipants(?int $maxParticipants): static
     {
         $this->maxParticipants = $maxParticipants;
 
@@ -231,9 +232,11 @@ class Outing
         return $this->cancelReason;
     }
 
-    public function setCancelReason(?string $cancelReason): void
+    public function setCancelReason(?string $cancelReason): static
     {
         $this->cancelReason = $cancelReason;
+
+        return $this;
     }
 
     public function getSite(): ?Site
@@ -241,8 +244,10 @@ class Outing
         return $this->site;
     }
 
-    public function setSite(?Site $site): void
+    public function setSite(?Site $site): static
     {
         $this->site = $site;
+
+        return $this;
     }
 }

@@ -5,8 +5,10 @@ namespace App\Enum;
 
 enum StatusName: string
 {
-    case CREATED = 'created';
-    case ONGOING = 'ongoing';
-    case PAST = 'past';
-    case CANCELLED = 'cancelled';
+    case CREATED = 'Créée';
+    case OPENED = "Ouverte";
+    case CLOSED = "Clôturée";
+    case ONGOING = 'Activité en cours';
+    case PAST = 'Passée';
+    case CANCELLED = 'Annulée';
 }
