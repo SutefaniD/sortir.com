@@ -6,10 +6,12 @@ use App\Entity\Participant;
 use App\Entity\Site;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 
 class ParticipantForm extends AbstractType
 {
@@ -31,6 +33,18 @@ class ParticipantForm extends AbstractType
                     'choice_label' => 'name',
                     'placeholder' => 'Choose a site',
                     'label' => 'Attachment site'
+                ])
+                ->add('profileImageFile', FileType::class, [
+                    'label' => 'Photo de profil (JPG, PNG, WEBP)',
+                    'mapped' => false,
+                    'required' => false,
+                    'constraints' => [
+                        new File([
+                            'maxSize' => '5M',
+                            'mimeTypes' => ['image/jpeg', 'image/png',  'image/webp'],
+                            'mimeTypesMessage' => 'Merci de télécharger une image valide',
+                        ]),
+                    ],
                 ]);
         }
 

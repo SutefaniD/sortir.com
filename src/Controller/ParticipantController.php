@@ -44,6 +44,16 @@ final class ParticipantController extends AbstractController
                 $participant->setAdministrator(false);
                 $participant->setActive(true);
 
+                $profileImage = $form->get('profileImageFile')->getData();
+                if ($profileImage) {
+                    $uploadsDir = $this->getParameter('kernel.project_dir') . '/public/uploads/profiles';
+                    $newFilename = uniqid() . '.' . $profileImage->guessExtension();
+
+                    $profileImage->move($uploadsDir, $newFilename);
+
+                    $participant->setProfilePicture('/uploads/profiles/' . $newFilename);
+                }
+
                 $entityManager->persist($participant);
                 $entityManager->flush();
 
@@ -54,7 +64,7 @@ final class ParticipantController extends AbstractController
         return $this->render('participant/create.html.twig', ['createParticipantForm' => $form]);
     }
 
-    #[Route('/update/profile', name: 'update_profile')]
+    #[Route('/update/profiles', name: 'update_profile')]
     public function update_profile(EntityManagerInterface $entityManager, Request $request): Response {
         $participant = $this->getUser();
 
@@ -66,6 +76,16 @@ final class ParticipantController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $profileImage = $form->get('profileImageFile')->getData();
+            if ($profileImage) {
+                $uploadsDir = $this->getParameter('kernel.project_dir') . '/public/uploads/profiles';
+                $newFilename = uniqid() . '.' . $profileImage->guessExtension();
+
+                $profileImage->move($uploadsDir, $newFilename);
+
+                $participant->setProfilePicture('/uploads/profiles/' . $newFilename);
+            }
+
             $entityManager->persist($participant);
             $entityManager->flush();
 
@@ -136,7 +156,7 @@ final class ParticipantController extends AbstractController
         return $this->redirectToRoute('main_home');
     }
 
-    #[Route('/profile/{id}', name: 'show_profile', methods: ['GET'])]
+    #[Route('/profiles/{id}', name: 'show_profile', methods: ['GET'])]
     public function showProfile(int $id, EntityManagerInterface $entityManager, ParticipantRepository $participantRepository, TokenStorageInterface $tokenStorage, Request $request): Response {
         $user = $participantRepository->find($id);
 

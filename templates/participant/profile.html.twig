@@ -2,6 +2,9 @@
     <h2>Mon profil</h2>
     <img src="{{ asset('assets/images/close.svg') }}" alt="" id="closeProfile">
     <ul>
+        {% if app.user.profilePicture %}
+            <li><img src="{{ asset(app.user.profilePicture) }}" alt=""></li>
+        {% endif %}
         <li>Nom : {{ app.user.lastName }}</li>
         <li>Prénom : {{ app.user.firstName }}</li>
         <li>Pseudo : {{ app.user.username }}</li>
