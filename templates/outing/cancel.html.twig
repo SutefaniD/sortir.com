@@ -20,66 +20,24 @@
                         {{ form_label(form.startingDateTime) }}
                         {{ form_widget(form.startingDateTime) }}
                     </div>
-                    <div>
-                        {{ form_label(form.registrationDeadline) }}
-                        {{ form_widget(form.registrationDeadline) }}
-                    </div>
-
-
-                    <div>
-                        {{ form_label(form.outingDetails) }}
-                        {{ form_widget(form.outingDetails) }}
+                     <div>
+                        {{ form_label(form.site) }}
+                        {{ form_widget(form.site) }}
                     </div>
                     <div>
                         {{ form_label(form.location) }}
                         {{ form_widget(form.location) }}
                     </div>
                 </div>
-
-                <!-- Colonne droite -->
-                {#            <div style="flex: 1;">#}
-                {#                <div>#}
-                {#                    {{ form_label(form.site) }}#}
-                {#                    {{ form_widget(form.site) }}#}
-                {#                </div>#}
-
-                <!-- Champs imbriqués de "location" -->
-                {#                <div>#}
-                {#                    {{ form_label(form.location.city) }}#}
-                {#                    {{ form_widget(form.location.city) }}#}
-                {#                </div>#}
-                {#                <div>#}
-                {#                    {{ form_label(form.location.name) }}#}
-                {#                    {{ form_widget(form.location.name) }}#}
-                {#                </div>#}
-                {#                <div>#}
-                {#                    {{ form_label(form.location.street) }}#}
-                {#                    {{ form_widget(form.location.street) }}#}
-                {#                </div>#}
-                {#                <div>#}
-                {#                    {{ form_label(form.location.zipCode) }}#}
-                {#                    {{ form_widget(form.location.zipCode) }}#}
-                {#                </div>#}
-                {#                <div>#}
-                {#                    {{ form_label(form.location.latitude) }}#}
-                {#                    {{ form_widget(form.location.latitude) }}#}
-                {#                </div>#}
-                {#                <div>#}
-                {#                    {{ form_label(form.location.longitude) }}#}
-                {#                    {{ form_widget(form.location.longitude) }}#}
-                {#                </div>#}
+        
             </div>
         </div>
 
         <br>
         <div style="display: flex; gap: 20px; justify-content: center;">
             {{ form_widget(form.save) }}
-            {{ form_widget(form.cancel) }}
-
-
+            <a href="{{ path('main_home') }}" class="btn btn-danger">Annuler</a>
         </div>
-
-
         {{ form_end(form) }}
         </div>
     {% endblock %}
@@ -87,12 +45,8 @@
 
 
 
-    {# Affichage conditionnel des actions #}
-    {% if app.user %}
-        {% if app.user == outing.organizer and outing.status.label in ['Créée', 'Ouverte'] %}
-            <a href="{{ path('outing_cancel', {id: outing.id}) }}"class="btn btn-danger">Annuler la sortie</a>
-        {% endif %}
-
+    {# Affichage conditionnel des actions S'inscrire/se désister #}
+   
         {% if app.user != outing.organizer %}
             {% if outing.status.label == 'Ouverte' and outing.registrationDeadline > now %}
                 {% if not outing.participants.contains(user) %}
