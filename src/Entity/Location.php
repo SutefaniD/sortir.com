@@ -25,7 +25,7 @@ class Location
         max: 250,
         maxMessage: "Le nom ne doit pas dépasser {{ limit }} caractères."
     )]
-    private string $name;
+    private ?string $name = null;
 
     #[ORM\Column(length: 100, nullable: false)]
     #[Assert\NotBlank(message: "La rue est obligatoire.")]
@@ -33,7 +33,7 @@ class Location
         max: 100,
         maxMessage: "La rue ne doit pas dépasser {{ limit }} caractères."
     )]
-    private string $street;
+    private ?string $street = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 8, nullable: true)]
     #[Assert\Regex(
@@ -55,7 +55,7 @@ class Location
     #[ORM\OneToMany(targetEntity: Outing::class, mappedBy: 'location')]
     private Collection $outings;
 
-    #[ORM\ManyToOne(inversedBy: 'locations')]
+    #[ORM\ManyToOne(targetEntity: City::class, inversedBy: 'locations')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotNull(message: "La ville est obligatoire.")]
     private ?City $city = null;
@@ -70,24 +70,24 @@ class Location
         return $this->id;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function setName(string $name): static
+    public function setName(?string $name): static
     {
         $this->name = $name;
 
         return $this;
     }
 
-    public function getStreet(): string
+    public function getStreet(): ?string
     {
         return $this->street;
     }
 
-    public function setStreet(string $street): static
+    public function setStreet(?string $street): static
     {
         $this->street = $street;
 
