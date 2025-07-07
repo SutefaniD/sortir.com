@@ -264,47 +264,40 @@ final class OutingController extends AbstractController
 
     //Suppression de Sortie
 
-    #[Route('/delete/{id}', name: 'delete', requirements: ['id' => '\d+'])]
-    // #[IsGranted('DELETE', subject: 'outing')]
-
+   / Suppression de Sortie
+    #[Route('/delete/{id}', name: 'delete', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
     public function delete(
         Outing $outing,
         Request $request,
-        Security $security,
-        EntityManagerInterface $em,
-        StatusRepository $statusRepo
+        EntityManagerInterface $em
     ): Response {
-        $user = $security->getUser();
-
+        $user = $this->getUser();
+        // Vérification de l'organisateur
         if ($outing->getOrganizer() !== $user) {
             throw $this->createAccessDeniedException("Vous n'êtes pas l'organisateur");
         }
-
+        // Vérification que la sortie n'a pas commencé
         if ($outing->getStartingDateTime() <= new \DateTime()) {
             throw $this->createAccessDeniedException("Sortie déjà commencée");
         }
-
+        // Création d'un formulaire de confirmation simple
         $form = $this->createFormBuilder()
-            ->add('cancelReason', TextareaType::class, ['label' => 'Motif d’annulation'])
-            ->add('submit', SubmitType::class, ['label' => 'Annuler la sortie'])
+            ->add('confirm', SubmitType::class, ['label' => 'Confirmer la suppression'])
             ->getForm();
-
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            $outing->setCancelReason($data['cancelReason']);
-            $outing->setStatus($statusRepo->findOneBy(['label' => 'Annulée']));
-
+            // Supprimer la sortie
+            $em->remove($outing);
             $em->flush();
-            $this->addFlash('info', 'Sortie annulée avec succès');
+            $this->addFlash('success', 'Sortie supprimée avec succès');
             return $this->redirectToRoute('outing_list');
         }
-
-        return $this->render('outing/cancel.html.twig', [
-            'form' => $form,
+        return $this->render('outing/delete.html.twig', [
+            'form' => $form->createView(),
             'outing' => $outing,
         ]);
     }
+
     /*
      * Inscription/Desinscription des participants
      *
