@@ -19,13 +19,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Validator\Validator\ValidatorInterface
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\Constraints;
 
 
 #[Route('/outing', name: "outing_")]
 final class OutingController extends AbstractController
 {
-    #[Route('/create', name: 'create')]
+    #[Route('/create', name: 'create',  methods: ['POST'])]
     public function create(
         Request                $request,
         EntityManagerInterface $em,
@@ -40,22 +41,17 @@ final class OutingController extends AbstractController
 
         $outing = new Outing();
         $outing->setOrganizer($user);
-        //$outing->setStatus($statusRepo->findOneBy(['label' => 'created']));
-
         if (!$user->getSite()) {
             throw new \LogicException("L'utilisateur n'a pas de site associé.");
         }
         $outing->setSite($outing->getOrganizer()->getSite());
-
         $form = $this->createForm(OutingTypeForm::class, $outing);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
             try {
-
                 // Définir le statut selon le bouton cliqué
-
                 if ($form->get('publish')->isClicked()) {
                     $outing->setStatus($statusRepo->findOneBy(['label' => 'Ouverte']));
                 } else {
@@ -69,7 +65,6 @@ final class OutingController extends AbstractController
                 $em->persist($outing);
                 $em->flush();
                 $this->addFlash('success', 'Sortie créée avec succès !');
-
 
                 //redirige sur la page d'affichage de Sortie
                 return $this->redirectToRoute('outing_list');
@@ -88,7 +83,7 @@ final class OutingController extends AbstractController
 
     // Page d'affichage de Sortie (par id)
 
-    #[Route('/detail/{id}', name: 'detail', requirements: ['id' => '\d+'])]
+    #[Route('/detail/{id}', name: 'detail', requirements: ['id' => '\d+'],  methods: ['GET'])]
     public function detail(int $id, OutingRepository $outingRepo): Response
     {
         $outing = $outingRepo->find($id);
@@ -96,7 +91,6 @@ final class OutingController extends AbstractController
         if (!$outing) {
             throw $this->createNotFoundException('Sortie non trouvée');
         }
-
         return $this->render('outing/detail.html.twig', [
             'outing' => $outing,
             'now' => new \DateTime()
@@ -131,7 +125,7 @@ final class OutingController extends AbstractController
 
     // pour la modification de Sortie
 
-    #[Route('/update/{id}', name: 'update', requirements: ['id' => '\d+'])]
+    #[Route('/update/{id}', name: 'update', requirements: ['id' => '\d+'],  methods: ['POST'] )]
     public function update(
         Outing $outing,
         Request $request,
@@ -221,7 +215,7 @@ final class OutingController extends AbstractController
 
 */
 // Annulation de Sortie
-    #[Route('/cancel/{id}', name: 'cancel', requirements: ['id' => '\d+'])]
+    #[Route('/cancel/{id}', name: 'cancel', requirements: ['id' => '\d+'],  methods: ['POST'] )]
     // #[IsGranted('CANCEL', subject: 'outing')]
 
     public function cancel(
@@ -238,7 +232,7 @@ final class OutingController extends AbstractController
         }
 
         if ($outing->getStartingDateTime() <= new \DateTime()) {
-            throw $this->createAccessDeniedException("Sortie déjà commencée");
+            throw $this->createAccessDeniedException("Sortie a déjà commencée");
         }
 
         $form = $this->createFormBuilder()
@@ -266,7 +260,7 @@ final class OutingController extends AbstractController
     //Suppression de Sortie
 
    / Suppression de Sortie
-    #[Route('/delete/{id}', name: 'delete', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    #[Route('/delete/{id}', name: 'delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
     public function delete(
         Outing $outing,
         Request $request,
