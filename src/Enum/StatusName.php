@@ -11,4 +11,5 @@ enum StatusName: string
     case ONGOING = 'Activité en cours';
     case PAST = 'Passée';
     case CANCELLED = 'Annulée';
+    case ARCHIVED = "Historisée";
 }
