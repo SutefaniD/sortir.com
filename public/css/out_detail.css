@@ -1,0 +1,13 @@
+/************************************************** Outing details**************************************************/
+main{
+    display:flex;
+    flex-direction: column;
+    justify-items: center;
+    align-content: center;
+    width: 80%;
+    height: 100vh;
+}
+p{
+    margin-top: 20px;
+    margin-bottom: 20px;
+}

@@ -9,17 +9,6 @@
     <h2>Créer une sortie</h2>
     <div class="outing">
 
-        {% for label, messages in app.flashes %}
-            {% for message in messages %}
-                <div class="alert alert-{{ label == 'error' ? 'danger' : 'success' }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endfor %}
-
-
-
-
         {{ form_start(form) }}
 
         <div style="display: flex; gap: 50px;">
@@ -91,15 +80,15 @@
         </div>
 
         <br>
+    <div style="display: flex; gap: 20px; justify-content: center;">
+        {{ form_widget(form.save) }}
+        {{ form_widget(form.publish) }}
+        <a href="{{ path('main_home') }}" class="btn btn-danger">Annuler</a>
+    </div>
 
-        <div style="display: flex; gap: 20px; justify-content: center;">
-            <button type="submit" class="btn btn-success">Enregistrer</button>
-            <button type="submit" class="btn btn-primary">Publier la sortie</button>
-            <a href="{{ path('main_home') }}" class="btn btn-danger">Annuler</a>
-        </div>
 
         {{ form_end(form) }}
-    </div>
+        </div>
 {% endblock %}
 
 
