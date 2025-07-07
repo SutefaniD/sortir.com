@@ -8,6 +8,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SearchType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -38,7 +39,7 @@ class SearchForm extends AbstractType
                 //'time_widget' => 'choice',
                 'required' => false,
             ])
-            ->add('endDate', DateTimeType::class, [
+            ->add('endDate', DateType::class, [
                 'label' => ' et ',
                 'widget' => 'single_text',
                 'required' => false,
@@ -55,7 +56,7 @@ class SearchForm extends AbstractType
                 'label' => "Sorties auxquelles je ne suis pas inscrit/e",
                 'required' => false,
             ])
-            ->add('pastOutings', CheckboxType::class, [
+            ->add('isPast', CheckboxType::class, [
                 'label' => "Sorties passées",
                 'required' => false,
             ]);

@@ -93,6 +93,90 @@ class OutingFixtures extends Fixture implements DependentFixtureInterface
             $this->addReference('outing_' . $i, $outing);
         }
 
+
+        $jane = $this->getReference('participant_user', Participant::class);
+        $siteReference = $this->getReference('site_1', Site::class);
+
+        for ($i = 50; $i < 60; $i++) {
+            $outing = new Outing();
+
+            $outing->setName($faker->sentence(3));
+            $startDate = (new \DateTime())->modify(rand(-10, 10) . ' days');
+            $outing->setStartingDateTime($startDate);
+            $outing->setDuration($faker->numberBetween(30, 1440));
+            $outing->setRegistrationDeadline((clone $startDate)->modify('-1 days'));
+            $outing->setMaxParticipants(rand(5, 30)); // max > nb participants pour garder de la marge
+            $outing->setOutingDetails($faker->text(100));
+
+            // Choix du statut
+            if ($startDate == $now) {
+                $outing->setStatus($statuses[StatusName::ONGOING->value]);
+            } elseif ($startDate > $now) {
+                $rand = $faker->randomFloat(2, 0, 1);
+                if ($rand <= 0.7) {
+                    $outing->setStatus($statuses[StatusName::OPENED->value]);
+                } else if ($rand <= 0.9) {
+                    $outing->setStatus($statuses[StatusName::CREATED->value]);
+                } elseif ($rand <= 0.95) {
+                    $outing->setStatus($statuses[StatusName::CLOSED->value]);
+                } else {
+                    $outing->setStatus($statuses[StatusName::CANCELLED->value]);
+                    $outing->setCancelReason($faker->sentence());
+                }
+            } else {
+                $rand = $faker->randomFloat(2, 0, 1);
+                if ($rand <= 0.8) {
+                    $outing->setStatus($statuses[StatusName::PAST->value]);
+                } else {
+                    $outing->setStatus($statuses[StatusName::CANCELLED->value]);
+                    $outing->setCancelReason($faker->sentence());
+                }
+            }
+
+            // Définir Jane comme organisatrice ou simple participante
+            if ($i < 55) {
+                $outing->setOrganizer($jane);
+            } else {
+                do {
+                    $organizerIndex = rand(1, 19); // évite d'attribuer Jane
+                } while ($organizerIndex === 0);
+                $organizer = $this->getReference('participant_' . $organizerIndex, Participant::class);
+                $outing->setOrganizer($organizer);
+            }
+
+            // Génération des participants
+            $possibleParticipants = range(0, 19);
+            if ($i < 55) {
+                // Jane déjà organisatrice, on l'exclut des participants
+                unset($possibleParticipants[0]);
+            }
+
+            $possibleParticipants = array_values($possibleParticipants);
+            $nbParticipants = rand(2, 19); // Jane + 2 à 19 autres = 3 à 20 au total
+
+            $participantsIndex = (array)array_rand($possibleParticipants, min($nbParticipants, count($possibleParticipants)));
+
+            foreach ($participantsIndex as $index) {
+                $participant = $this->getReference('participant_' . $possibleParticipants[$index], Participant::class);
+                $outing->addParticipant($participant);
+            }
+
+            // Ajout manuel de Jane comme participante si elle n'est pas organisatrice
+            if ($i >= 55) {
+                $outing->addParticipant($jane);
+            }
+
+            // Localisation et site
+            $locationReference = $this->getReference('location_' . rand(0, LocationFixtures::LOCATION_COUNT - 1), Location::class);
+            $outing->setLocation($locationReference);
+
+            $outing->setSite($siteReference);
+
+            $manager->persist($outing);
+            $this->addReference('outing_' . $i, $outing);
+        }
+
+
         $manager->flush();
     }
 

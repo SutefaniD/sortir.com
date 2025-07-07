@@ -32,12 +32,15 @@ final class MainController extends AbstractController
 
             //dd(count($outings), $outings);
         } else {
+
+            // Par défaut, affichage de tout sauf événements CREATED dont pas organisateur
             $outings = $outingRepository->findAll();
         }
 
         return $this->render('home/index.html.twig', [
             'searchForm' => $searchForm->createView(),
-            'outings' => $outings
+            'outings' => $outings,
+            'user' => $user,
         ]);
     }
 }

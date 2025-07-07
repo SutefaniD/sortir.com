@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\DTO\SearchFormDTO;
 use App\Entity\Outing;
 use App\Entity\Participant;
+use App\Enum\StatusName;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -52,6 +53,31 @@ class OutingRepository extends ServiceEntityRepository
             $queryBuilder
                 ->andWhere('o.startingDateTime <= :endDate') // TODO : demander client
                 ->setParameter('endDate', $filter->getEndDate());
+        }
+
+        $orX = $queryBuilder->expr()->orX();
+
+        if ($filter->getIsOrganizer()) {
+            $orX->add('o.organizer = :user');
+        }
+
+        if ($filter->getIsParticipant()) {
+            $orX->add(':user MEMBER OF o.participants');
+        }
+
+        if ($filter->getIsNotParticipant()) {
+            $orX->add(':user NOT MEMBER OF o.participants');
+        }
+
+        if ($orX->count() > 0) {
+            $queryBuilder->andWhere($orX)
+                ->setParameter('user', $user);
+        }
+
+        if ($filter->getIsPast()) {
+            $queryBuilder
+                ->andWhere('st.label = :pastLabel')
+                ->setParameter('pastLabel', StatusName::PAST);
         }
 
 

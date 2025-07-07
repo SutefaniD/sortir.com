@@ -39,7 +39,7 @@
                         searchForm.isOrganizer,
                         searchForm.isParticipant,
                         searchForm.isNotParticipant,
-                        searchForm.pastOutings
+                        searchForm.isPast
                     ] %}
                         <div class="form-group">
                             <label>
@@ -86,7 +86,7 @@
                                     {% endif %}
                                 {% endfor %}
                             </td>
-                            <td><a href="">{{ outing.organizer.username }}</a></td>
+                            <td><a href="">{{ outing.organizer.username }} / {{ outing.organizer.firstname|capitalize }} {{ outing.organizer.lastName|slice(0,1)|upper }}.</a></td>
                             <td>
                                 <a href="">Afficher</a>
                                 <a href="">Se désister</a>

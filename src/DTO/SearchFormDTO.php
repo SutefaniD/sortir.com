@@ -11,11 +11,10 @@ class SearchFormDTO
     private ?\DateTimeInterface $startDate = null;
     private ?\DateTimeInterface $endDate = null;
     private ?bool $isOrganizer = false;
+    public ?bool $isParticipant = false;
+    public ?bool $isNotParticipant = false;
 
-//
-//    public ?bool isParticipant = false;
-//
-//    public ?bool isNotParticipant = false;
+    public ?bool $isPast = false;
 
     public function getSite(): ?Site
     {
@@ -66,4 +65,37 @@ class SearchFormDTO
     {
         $this->isOrganizer = $isOrganizer;
     }
+
+    public function getIsParticipant(): ?bool
+    {
+        return $this->isParticipant;
+    }
+
+    public function setIsParticipant(?bool $isParticipant): void
+    {
+        $this->isParticipant = $isParticipant;
+    }
+
+    public function getIsNotParticipant(): ?bool
+    {
+        return $this->isNotParticipant;
+    }
+
+    public function setIsNotParticipant(?bool $isNotParticipant): void
+    {
+        $this->isNotParticipant = $isNotParticipant;
+    }
+
+
+    public function getIsPast(): ?bool
+    {
+        return $this->isPast;
+    }
+
+    public function setIsPast(?bool $isPast): void
+    {
+        $this->isPast = $isPast;
+    }
+
+
 }
