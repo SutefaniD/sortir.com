@@ -76,7 +76,7 @@
                         <tr>
                             <td>{{ outing.name }}</td>
                             <td>{{ outing.startingDateTime|date("d/m/Y H:i") }}</td>
-                            <td>{{ outing.registrationDeadline|date("d/m/Y H:i") }}</td>
+                            <td>{{ outing.registrationDeadline|date("d/m/Y") }}</td>
                             <td>{{ outing.participants|length }} / {{ outing.maxParticipants }}</td>
                             <td>{{ outing.status.label.value }}</td>
                             <td>
