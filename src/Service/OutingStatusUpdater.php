@@ -13,12 +13,12 @@ class OutingStatusUpdater
         private StatusRepository $statusRepository
     ){}
 
-    public function updateStatus(Outing $outing) : void
+    public function updateStatus(Outing $outing) : bool
     {
         $currentLabel = $outing->getStatus()->getLabel();
 
         if ($currentLabel !== StatusName::OPENED) {
-            return;
+            return false;
         }
 
         $today = new \DateTimeImmutable('today'); // date + heure à 0h00
@@ -44,15 +44,20 @@ class OutingStatusUpdater
             $newLabel = $this->statusRepository->findOneBy(['label' => StatusName::OPENED]);
         }
 
-        $outing->setStatus($newLabel);
+        if ($newLabel && $newLabel->getLabel() !== $currentLabel) {
+            $outing->setStatus($newLabel);
+            return true;
+        }
+
+        return false;
     }
 
-    public function archiveOuting(Outing $outing) : void
+    public function archiveOuting(Outing $outing) : bool
     {
         $label = $outing->getStatus()->getLabel();
 
         if (!in_array($label, [StatusName::PAST, StatusName::CANCELLED], true)) {
-            throw new \LogicException("Only 'past' or 'cancelled' outings can be archived, current status is '$label'.");
+            return false;
         }
 
         $today = new \DateTimeImmutable('today'); // date + heure à 0h00
@@ -61,9 +66,12 @@ class OutingStatusUpdater
 
         if ($today >= $archiveDate) {
             $status = $this->statusRepository->findOneBy(['label' => StatusName::ARCHIVED]);
+            if ($status && $status->getLabel() !== $label) {
+                $outing->setStatus($status);
+                return true;
+            }
         }
 
-        $outing->setStatus($status);
-
+        return false;
     }
 }

@@ -80,20 +80,35 @@
                             <td>{{ outing.participants|length }} / {{ outing.maxParticipants }}</td>
                             <td>{{ outing.status.label.value }}</td>
                             <td>
-                                {% for participant in outing.participants %}
-                                    {% if participant.username == app.user.username %}
-                                        x
-                                    {% endif %}
-                                {% endfor %}
+                                {% if outingAuth.isUserParticipant(outing, user) %}
+                                    x
+                                {% endif %}
                             </td>
                             <td><a href="">{{ outing.organizer.username }} / {{ outing.organizer.firstname|capitalize }} {{ outing.organizer.lastName|slice(0,1)|upper }}.</a></td>
                             <td>
-                                <a href="">Afficher</a>
-                                <a href="">Se désister</a>
-                                <a href="">S'inscrire</a>
-                                <a href="">Modifier</a>
-                                <a href="">Publier</a>
-                                <a href="">Annuler</a>
+                                {% if outingAuth.canUserDisplay(outing, user) %}
+                                    <a href="">Afficher</a>
+                                {% endif %}
+
+                                {% if outingAuth.canUserUnregister(outing, user) %}
+                                    <a href="">Se désister</a>
+                                {% endif %}
+
+                                {% if outingAuth.canUserRegister(outing, user) %}
+                                    <a href="">S'inscrire</a>
+                                {% endif %}
+
+                                {% if outingAuth.canUserUpdate(outing, user) %}
+                                    <a href="">Modifier</a>
+                                {% endif %}
+
+                                {% if outingAuth.canUserPublish(outing, user) %}
+                                    <a href="">Publier</a>
+                                {% endif %}
+
+                                {% if outingAuth.canUserCancel(outing, user) %}
+                                    <a href="">Annuler</a>
+                                {% endif %}
                             </td>
                         </tr>
                     {%  endfor %}
