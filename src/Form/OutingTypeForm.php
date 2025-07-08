@@ -43,7 +43,9 @@ class OutingTypeForm extends AbstractType
             ])
             ->add('location', EntityType::class, [
                 'class' => Location::class,
-                'choice_label' => 'name',
+                'choice_label'  => function ($location) {
+                    return $location->getName() . ', ' . $location->getStreet() . ' - ' . $location->getCity()->getName();
+                },
                 'label' => 'Lieux :'
             ])
             //->add('cancelReason', TextareaType::class, [
@@ -69,15 +71,15 @@ class OutingTypeForm extends AbstractType
             ->add('publish', SubmitType::class, [
                 'label' => 'Publier la sortie',
                 'attr' => ['class' => 'btn btn-primary']
-            ])
-            ->add('cancel', SubmitType::class, [
-            'label' => 'Annuler la sortie',
-            'attr' => ['class' => 'btn btn-primary']
-            ])
-            ->add('delete', SubmitType::class, [
-            'label' => 'Supprimer la sortie',
-            'attr' => ['class' => 'btn btn-primary']
-        ]);
+            ]);
+//            ->add('cancel', SubmitType::class, [
+//            'label' => 'Annuler la sortie',
+//            'attr' => ['class' => 'btn btn-primary']
+//            ])
+//            ->add('delete', SubmitType::class, [
+//            'label' => 'Supprimer la sortie',
+//            'attr' => ['class' => 'btn btn-primary']
+//        ]);
 
     }
 

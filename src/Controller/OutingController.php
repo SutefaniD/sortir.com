@@ -26,12 +26,8 @@ use Symfony\Component\Validator\Constraints;
 #[Route('/outing', name: "outing_")]
 final class OutingController extends AbstractController
 {
-    #[Route('/create', name: 'create',  methods: ['POST'])]
-    public function create(
-        Request                $request,
-        EntityManagerInterface $em,
-        StatusRepository       $statusRepo
-    ): Response
+    #[Route('/create', name: 'create')]
+    public function create(Request $request, EntityManagerInterface $entityManager, StatusRepository $statusRepo): Response
     {
         $user = $this->getUser();
 
@@ -41,10 +37,13 @@ final class OutingController extends AbstractController
 
         $outing = new Outing();
         $outing->setOrganizer($user);
+
         if (!$user->getSite()) {
             throw new \LogicException("L'utilisateur n'a pas de site associé.");
         }
+
         $outing->setSite($outing->getOrganizer()->getSite());
+
         $form = $this->createForm(OutingTypeForm::class, $outing);
         $form->handleRequest($request);
 
@@ -57,13 +56,13 @@ final class OutingController extends AbstractController
                 } else {
                     $outing->setStatus($statusRepo->findOneBy(['label' => 'Créée']));
                 }
-                    $outing->setstartingDateTime(new \DateTime());
-                    $outing->setregistrationDeadline(new \DateTime());
+//                    $outing->setstartingDateTime(new \DateTime());
+//                    $outing->setregistrationDeadline(new \DateTime());
 
               //  $outing->setStatus($statusRepo->findOneBy(['label' => 'Ouverte']));
 
-                $em->persist($outing);
-                $em->flush();
+                $entityManager->persist($outing);
+                $entityManager->flush();
                 $this->addFlash('success', 'Sortie créée avec succès !');
 
                 //redirige sur la page d'affichage de Sortie
@@ -259,7 +258,7 @@ final class OutingController extends AbstractController
 
     //Suppression de Sortie
 
-   / Suppression de Sortie
+   // Suppression de Sortie
     #[Route('/delete/{id}', name: 'delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
     public function delete(
         Outing $outing,
