@@ -219,12 +219,12 @@ final class OutingController extends AbstractController
         StatusRepository $statusRepo
     ): Response {
         $user = $security->getUser();
-        //POUR TESTER EN BAS
+        //POUR TESTER EN BAS JE COMMENTE CETTE CONDITION
 
    /*     if ($outing->getOrganizer() !== $user) {
             throw $this->createAccessDeniedException("Vous n'êtes pas l'organisateur");
         }
-*/
+    */
         if ($outing->getStartingDateTime() <= new \DateTime()) {
             throw $this->createAccessDeniedException("Sortie a déjà commencée");
         }
@@ -242,7 +242,7 @@ final class OutingController extends AbstractController
 
             $em->flush();
             $this->addFlash('info', 'Sortie annulée avec succès');
-            return $this->redirectToRoute('outing_list');
+            return $this->redirectToRoute('main_home');
         }
 
         return $this->render('outing/cancel.html.twig', [
