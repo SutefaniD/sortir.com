@@ -5,25 +5,25 @@
 
 {% block main %}
     <div class="main-content">
-        <h1>{{ outing.name }}</h1>
+        <h1>Afficher une sortie</h1>
 
         <!-- Détails de la sortie -->
-
+        <p>Nom de la sortie : {{ outing.name }}</p>
         <p>Date et heure de la sortie : {{ outing.startingDateTime|date('d/m/Y H:i') }} </p>
-        <p>Date limite d'inscription : {{ outing.registrationDeadline|date('d/m/Y H:i') }}</p>
+        <p>Date limite d'inscription : {{ outing.registrationDeadline|date('d/m/Y') }}</p>
         <p>Nombre de places : {{ outing.maxParticipants }}</p>
         <p>Durée : {{ outing.duration }} minutes</p>
-        <p>Description et info : {{ outing.outingDetails }}</p>
+        <p>Description et infos : {{ outing.outingDetails }}</p>
 
         {# <p>Site : {{ outing.site.name }}</p>  #}
         <p>Nom du lieu : {{ outing.location.name }}</p>
         <p>Rue : {{ outing.location.street }}</p>
-
         <p>Ville : {{ outing.location.city.name }}</p>
-    {#    <p>Code postal : {{ outing.location.zipCode }}</p>#}
+        <p>Code postal : {{ outing.location.city.zipCode }}</p>
         <p>Latitude : {{ outing.location.latitude }}</p>
         <p>Longitude : {{ outing.location.longitude }}</p>
-    {#  la partie concernante des inscrits#}
+
+        {#  la partie concernante des inscrits#}
         <h2>Liste des participants inscrits :</h2>
         <table class="participants-table">
             <thead>
@@ -36,7 +36,7 @@
             {% for participant in outing.participants %}
                 <tr>
                     <td>{{ participant.username }}</td>
-                    <td>{{ participant.lastname }}</td>
+                    <td>{{ participant.firstname|capitalize}} {{ participant.lastname|upper }}</td>
                 </tr>
             {% endfor %}
             </tbody>

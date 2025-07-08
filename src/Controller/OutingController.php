@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use App\Entity\Location;
 use App\Entity\Outing;
+use App\Enum\StatusName;
 use App\Form\LocationForm;
 use App\Form\OutingTypeForm;
 use App\Repository\OutingRepository;
@@ -44,37 +45,48 @@ final class OutingController extends AbstractController
         $form = $this->createForm(OutingTypeForm::class, $outing);
         $form->handleRequest($request);
 
+        // Définir le statut selon le bouton cliqué
+        if ($form->isSubmitted()) {
+            if ($form->get('saveOpened')->isClicked()) {
+                $status = $statusRepo->findOneBy(['label' => StatusName::OPENED->value]);
+                if (!$status) {
+                    throw new \LogicException('Le statut "Ouverte" est introuvable en base.');
+                }
+                $outing->setStatus($status);
+
+            } elseif ($form->get('saveCreated')->isClicked()) {
+                $status = $statusRepo->findOneBy(['label' => StatusName::CREATED->value]);
+                if (!$status) {
+                    throw new \LogicException('Le statut "Créée" est introuvable en base.');
+                }
+                $outing->setStatus($status);
+            }
+        }
+
+        dump($outing->getStatus());
         if ($form->isSubmitted() && $form->isValid()) {
 
             try {
-                // Définir le statut selon le bouton cliqué
-                if ($form->get('publish')->isClicked()) {
-                    $outing->setStatus($statusRepo->findOneBy(['label' => 'Ouverte']));
-                } else {
-                    $outing->setStatus($statusRepo->findOneBy(['label' => 'Créée']));
-                }
-//                    $outing->setstartingDateTime(new \DateTime());
-//                    $outing->setregistrationDeadline(new \DateTime());
-
-              //  $outing->setStatus($statusRepo->findOneBy(['label' => 'Ouverte']));
-
                 $entityManager->persist($outing);
                 $entityManager->flush();
                 $this->addFlash('success', 'Sortie créée avec succès !');
 
-                //redirige sur la page d'affichage de Sortie
-                return $this->redirectToRoute('outing_list');
-             //   return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
-
+                // Redirection selon le bouton cliqué
+                if ($form->get('saveOpened')->isClicked()) {
+                    return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
+                } else {
+                    return $this->redirectToRoute('main_home');
                 }
-                catch (Exception $exception) {
-                    $this->addFlash('warning', $exception->getMessage());
-            }}
+
+            } catch (Exception $exception) {
+                $this->addFlash('warning', $exception->getMessage());
+            }
+        }
 
             return $this->render('outing/create.html.twig', [
                 'form' => $form
             ]);
-        }
+    }
 
 
     // Page d'affichage de Sortie (par id)
@@ -93,31 +105,6 @@ final class OutingController extends AbstractController
         ]);
     }
 
-
-// pour création d'une page Liste de Sorties (lecture)
-    #[Route('/list', name: 'list')]
-    public function list(
-        OutingRepository $outingRepo,
-        Request $request
-    ): Response {
-        $user = $this->getUser();
-        $siteFilter = $request->query->get('site');
-        $now = new \DateTime();
-
-        // Récupération avec filtres
-        //pour tester pour instant
-        $outings = $outingRepo->findAll();
-        /* code pour remplacer test du haut
-        $outings = $outingRepo->findAllWithFilters(
-            $user->getId(),
-            $siteFilter
-        );
-*/
-        return $this->render('outing/list.html.twig', [
-            'outings' => $outings,
-            'now' => $now
-        ]);
-    }
 
     // pour la modification de Sortie
 

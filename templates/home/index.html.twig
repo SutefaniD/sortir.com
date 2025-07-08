@@ -31,10 +31,6 @@
                     </div>
                 </div>
                 <div class="form-right">
-{#                    {{ form_row(searchForm.isOrganizer) }}#}
-{#                    {{ form_row(searchForm.isParticipant) }}#}
-{#                    {{ form_row(searchForm.isNotParticipant) }}#}
-{#                    {{ form_row(searchForm.pastOutings) }}#}
                     {% for checkbox in [
                         searchForm.isOrganizer,
                         searchForm.isParticipant,
@@ -87,7 +83,7 @@
                             <td><a href="">{{ outing.organizer.username }} / {{ outing.organizer.firstname|capitalize }} {{ outing.organizer.lastName|slice(0,1)|upper }}.</a></td>
                             <td>
                                 {% if outingAuth.canUserDisplay(outing, user) %}
-                                    <a href="">Afficher</a>
+                                    <a href="{{ path('outing_detail', {'id': outing.id}) }}">Afficher</a>
                                 {% endif %}
 
                                 {% if outingAuth.canUserUnregister(outing, user) %}
@@ -99,7 +95,7 @@
                                 {% endif %}
 
                                 {% if outingAuth.canUserUpdate(outing, user) %}
-                                    <a href="">Modifier</a>
+                                    <a href="{{ path('outing_update', {'id': outing.id}) }}">Modifier</a>
                                 {% endif %}
 
                                 {% if outingAuth.canUserPublish(outing, user) %}
