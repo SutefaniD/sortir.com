@@ -80,18 +80,18 @@
                                     x
                                 {% endif %}
                             </td>
-                            <td><a href="">{{ outing.organizer.username }} / {{ outing.organizer.firstname|capitalize }} {{ outing.organizer.lastName|slice(0,1)|upper }}.</a></td>
+                            <td><a href="{{ path('participant_show_profile', {'id': outing.organizer.id}) }}">{{ outing.organizer.username }} / {{ outing.organizer.firstname|capitalize }} {{ outing.organizer.lastName|slice(0,1)|upper }}.</a></td>
                             <td>
                                 {% if outingAuth.canUserDisplay(outing, user) %}
                                     <a href="{{ path('outing_detail', {'id': outing.id}) }}">Afficher</a>
                                 {% endif %}
 
                                 {% if outingAuth.canUserUnregister(outing, user) %}
-                                    <a href="">Se désister</a>
+                                    <a href="{{ path('outing_unregister', {'id': outing.id}) }}">Se désister</a>
                                 {% endif %}
 
                                 {% if outingAuth.canUserRegister(outing, user) %}
-                                    <a href="">S'inscrire</a>
+                                    <a href="{{ path('outing_register', {'id': outing.id}) }}">S'inscrire</a>
                                 {% endif %}
 
                                 {% if outingAuth.canUserUpdate(outing, user) %}
@@ -103,7 +103,7 @@
                                 {% endif %}
 
                                 {% if outingAuth.canUserCancel(outing, user) %}
-                                    <a href="">Annuler</a>
+                                    <a href="{{ path('outing_cancel', {'id': outing.id}) }}">Annuler</a>
                                 {% endif %}
                             </td>
                         </tr>

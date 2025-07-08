@@ -8,6 +8,9 @@
     <div class="container">
         <h1>{{ user.username }}</h1>
         <ul>
+            {% if user.profilePicture %}
+                <li><img src="{{ user.profilePicture }}" alt=""></li>
+            {% endif %}
             <li>Nom : {{ user.lastName }}</li>
             <li>Prénom : {{ user.firstName }}</li>
             <li>Téléphone : {{ user.phone }}</li>
