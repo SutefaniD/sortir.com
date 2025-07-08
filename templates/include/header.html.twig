@@ -16,6 +16,7 @@
 
                 {% if app.user and app.user.administrator == false %}
                     <p class="nav-button"><a href="{{ path('outing_create') }}">Create outing</a></p>
+                    <p class="nav-button"><a href="{{ path('outing_create_location') }}">Create location</a></p>
                 {% endif %}
 
                 <p class="nav-button">Hello {{ app.user.firstName }} !</p>

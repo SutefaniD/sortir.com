@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Import participants{% endblock %}
+
+{% block css %}<link rel="stylesheet" href="{{ asset('assets/css/admin.css') }}">{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <h2>Importer des participants</h2>
+        {{ form(form) }}
+    </div>
+{% endblock %}

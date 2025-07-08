@@ -4,10 +4,11 @@
 namespace App\Controller;
 
 use App\Entity\Outing;
+use App\Form\FilterForm;
 use App\Form\OutingTypeForm;
-use App\Form\SearchForm;
 use App\Repository\OutingRepository;
 use App\Repository\StatusRepository;
+use App\Repository\ParticipantRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -52,7 +53,6 @@ final class OutingController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-
 
     // pour la création d'une page affichage de sortie (par id)
 
@@ -194,6 +194,24 @@ final class OutingController extends AbstractController
         return $this->redirectToRoute('outing_show', ['id' => $outing->getId()]);
     }
 */
+
+    #[Route('/create/location', name: 'create_location')]
+    public function create_location(EntityManagerInterface $entityManager, Request $request): Response
+    {
+        $location = new Location();
+        $form = $this->createForm(LocationForm::class, $location);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($location);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('main_home');
+        }
+
+        return $this->render('outing/create_location.html.twig', ['form' => $form]);
+    }
 
 }
 

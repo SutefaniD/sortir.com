@@ -159,6 +159,10 @@ footer {
     font-size: 1rem;
 }
 
+.profile-drawer ul li img {
+    height: 150px;
+}
+
 .profile-drawer .drawer-button {
     display: inline-block;
     text-align: center;

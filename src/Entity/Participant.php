@@ -6,6 +6,7 @@ use App\Repository\ParticipantRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -57,6 +58,16 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: Types::BOOLEAN, nullable: false)]
     private bool $active = false;
+
+    #[ORM\Column(nullable: true)]
+    private ?string $profilePicture = null;
+
+    #[Assert\File(
+        maxSize: '5M',
+        mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+        mimeTypesMessage: 'Merci de télécharger une image valide (jpg, png, webp).'
+    )]
+    private ?UploadedFile $profileImageFile = null;
 
     /**
      * @var Collection<int, Outing>
@@ -181,6 +192,26 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getProfilePicture(): ?string
+    {
+        return $this->profilePicture;
+    }
+
+    public function setProfilePicture(?string $profilePicture): void
+    {
+        $this->profilePicture = $profilePicture;
+    }
+
+    public function getProfileImageFile(): ?UploadedFile
+    {
+        return $this->profileImageFile;
+    }
+
+    public function setProfileImageFile(?UploadedFile $profileImageFile): void
+    {
+        $this->profileImageFile = $profileImageFile;
+    }
+
     public function getRoles(): array
     {
         $roles = ['ROLE_USER'];
@@ -271,4 +302,8 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function isActive(): bool
+    {
+        return $this->active ?? false;
+    }
 }

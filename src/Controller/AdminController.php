@@ -6,6 +6,7 @@ use App\Entity\City;
 use App\Entity\Participant;
 use App\Entity\Site;
 use App\Form\CityForm;
+use App\Form\CsvImportForm;
 use App\Form\ParticipantForm;
 use App\Form\SiteForm;
 use App\Repository\CityRepository;
@@ -32,6 +33,52 @@ final class AdminController extends AbstractController
         $participants = $participantRepository->findAll();
 
         return $this->render('admin/all_participants.html.twig', ['participants' => $participants]);
+    }
+
+    #[Route('/participant/import-users', name: 'import_users')]
+    public function importUsers(EntityManagerInterface $entityManager, Request $request, SiteRepository $siteRepository): Response
+    {
+        $form = $this->createForm(CsvImportForm::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $csvFile = $form->get('csv_file')->getData();
+            $handle = fopen($csvFile->getPathname(), 'r');
+
+            $headers = fgetcsv($handle);
+
+//            $created = 0;
+            while(($row = fgetcsv($handle)) !== false) {
+                $data = array_combine($headers, $row);
+
+                $participant = new Participant();
+                $participant->setLastName($data['last_name'] ?? '');
+                $participant->setFirstName($data['first_name'] ?? '');
+                $participant->setUsername($data['username'] ?? '');
+                $participant->setPhone($data['phone'] ?? '');
+                $participant->setEmail($data['email'] ?? '');
+                $hashedPassword = $this->passwordHasher->hashPassword($participant, $data['password'] ?? '');
+                $participant->setPassword($hashedPassword);
+
+                $site = $siteRepository->find($data['site_id'] ?? null);
+                $participant->setSite($site);
+
+                $participant->setAdministrator(false);
+                $participant->setActive(true);
+
+                $entityManager->persist($participant);
+//                $created++;
+            }
+
+            fclose($handle);
+            $entityManager->flush();
+
+//            $this->addFlash('success', "$created utilisateurs importés avec succès !");
+
+            return $this->redirectToRoute('admin_all_users');
+        }
+
+        return $this->render('admin/import_users.html.twig', ['form' => $form]);
     }
 
     #[Route('/participant/create', name: 'create_user')]
