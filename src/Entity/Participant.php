@@ -62,11 +62,7 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?string $profilePicture = null;
 
-    #[Assert\File(
-        maxSize: '5M',
-        mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
-        mimeTypesMessage: 'Merci de télécharger une image valide (jpg, png, webp).'
-    )]
+    #[Assert\File(maxSize: '5M', mimeTypes: ['image/jpeg', 'image/png', 'image/webp'], mimeTypesMessage: 'Merci de télécharger une image valide (jpg, png, webp).')]
     private ?UploadedFile $profileImageFile = null;
 
     /**
@@ -300,10 +296,5 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
         $this->site = $site;
 
         return $this;
-    }
-
-    public function isActive(): bool
-    {
-        return $this->active ?? false;
     }
 }
