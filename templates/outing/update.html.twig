@@ -84,11 +84,14 @@
     <div style="display: flex; gap: 20px; justify-content: center;">
         {{ form_widget(form.save) }}
         {{ form_widget(form.publish) }}
-        {{ form_widget(form.delete) }}
-
-        {% if app.user == outing.organizer and outing.status.label in ['Créée', 'Ouverte'] %}
-            <a href="{{ path('outing_cancel', {id: outing.id}) }}"class="btn btn-danger">Annuler la sortie</a>
-        {% endif %}
+        {#{{ form_widget(form.delete) }}#}
+{#        //{{ form_widget(form.cancel) }}#}
+         {% if app.user %}
+            {% if app.user == outing.organizer and outing.status.label in ['Créée', 'Ouverte'] %}
+                <a href="{{ path('outing_cancel', {id: outing.id}) }}" class="btn btn-danger">Annuler la sortie</a>
+            {% endif %}
+         {% endif %}
+{#        {{ form_widget(form.delete) }}#}
 
 
     </div>

@@ -67,7 +67,7 @@ class Outing
 
     #[ORM\ManyToOne(targetEntity: Status::class, inversedBy: "outings")]
     #[ORM\JoinColumn(nullable: false)]
-    //#[Assert\NotNull(message: "Le statut de la sortie est obligatoire.")]
+//    #[Assert\NotNull(message: "Le statut de la sortie est obligatoire.")]
     private ?Status $status = null;
 
     #[ORM\ManyToOne(targetEntity: Location::class, inversedBy: 'outings')]
