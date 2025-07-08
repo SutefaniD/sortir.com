@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/outing', name: "outing_")]
 final class OutingController extends AbstractController
 {
-    #[Route('/create', name: 'create')]
+    #[Route('/create', name: 'create', methods: ['GET', 'POST'])]
     public function create(Request $request, EntityManagerInterface $entityManager, StatusRepository $statusRepo): Response
     {
         $user = $this->getUser();
@@ -137,7 +137,8 @@ final class OutingController extends AbstractController
                 }
 
                 // Sinon rediriger vers la page d’annulation dédiée
-                return $this->redirectToRoute('outing/cancel.html.twig', ['id' => $outing->getId()]);
+                //return $this->redirectToRoute('outing/cancel.html.twig', ['id' => $outing->getId()]);
+                return $this->redirectToRoute('outing_cancel', ['id' => $outing->getId()]);
             }
 
             // Cas : Bouton "Publier"
@@ -207,7 +208,7 @@ final class OutingController extends AbstractController
 
 */
 // Annulation de Sortie
-    #[Route('/cancel/{id}', name: 'cancel', requirements: ['id' => '\d+'],  methods: ['POST'] )]
+    #[Route('/cancel/{id}', name: 'cancel', requirements: ['id' => '\d+'],  methods: ['GET', 'POST'] )]
     // #[IsGranted('CANCEL', subject: 'outing')]
 
     public function cancel(
@@ -218,11 +219,12 @@ final class OutingController extends AbstractController
         StatusRepository $statusRepo
     ): Response {
         $user = $security->getUser();
+        //POUR TESTER EN BAS
 
-        if ($outing->getOrganizer() !== $user) {
+   /*     if ($outing->getOrganizer() !== $user) {
             throw $this->createAccessDeniedException("Vous n'êtes pas l'organisateur");
         }
-
+*/
         if ($outing->getStartingDateTime() <= new \DateTime()) {
             throw $this->createAccessDeniedException("Sortie a déjà commencée");
         }
