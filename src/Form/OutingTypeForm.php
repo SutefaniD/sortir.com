@@ -8,6 +8,7 @@ use App\Entity\Status;
 use App\Entity\Participant;
 use App\Entity\Outing;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -40,18 +41,45 @@ class OutingTypeForm extends AbstractType
             ->add('outingDetails', TextareaType::class, [
                 "label" => "Déscription et info : "
             ])
-
-            ->add('site', EntityType::class, [
-                'class' => Site::class,
-                'choice_label' => 'name',
-                'label' => 'Site :'
+            ->add('location', EntityType::class, [
+                'class' => Location::class,
+                'choice_label'  => function ($location) {
+                    return $location->getName() . ', ' . $location->getStreet() . ' - ' . $location->getCity()->getName();
+                },
+                'label' => 'Lieux :'
             ])
+            //->add('cancelReason', TextareaType::class, [
+           //     "label" => "Motif :"
+          //  ])
 
-            ->add('location', LocationForm::class, [
-                'label' => false // formulaire imbriqué, labels gérés à l’intérieur
+//            ->add('site', EntityType::class, [
+//                'class' => Site::class,
+//                'choice_label' => 'name',
+//                'label' => 'Site :'
+//            ]);
+
+
+//            ->add('location', LocationForm::class, [
+//                'label' => false // formulaire imbriqué, labels gérés à l’intérieur
+//            ]);
+        // les boutons d'envoie de formulaire'
+
+            ->add('save', SubmitType::class, [
+            'label' => 'Enregistrer',
+            'attr' => ['class' => 'btn btn-success']
+             ])
+            ->add('publish', SubmitType::class, [
+                'label' => 'Publier la sortie',
+                'attr' => ['class' => 'btn btn-primary']
             ]);
-
-
+//            ->add('cancel', SubmitType::class, [
+//            'label' => 'Annuler la sortie',
+//            'attr' => ['class' => 'btn btn-primary']
+//            ])
+//            ->add('delete', SubmitType::class, [
+//            'label' => 'Supprimer la sortie',
+//            'attr' => ['class' => 'btn btn-primary']
+//        ]);
 
     }
 
