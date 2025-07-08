@@ -6,6 +6,7 @@ use App\Repository\ParticipantRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -39,7 +40,7 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank(message: 'Please enter your phone number')]
     #[Assert\Length(min: 10, maxMessage: 'Too short ! 10 characters at least !')]
     #[Assert\Length(max: 10, maxMessage: 'Too long ! 10 characters at most !')]
-    #[ORM\Column(length: 14, nullable: false)]
+    #[ORM\Column(length: 10, nullable: false)]
     private ?string $phone = null;
 
     #[Assert\NotBlank(message: 'Please enter your email')]
@@ -58,6 +59,16 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::BOOLEAN, nullable: false)]
     private bool $active = false;
 
+    #[ORM\Column(nullable: true)]
+    private ?string $profilePicture = null;
+
+    #[Assert\File(
+        maxSize: '5M',
+        mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+        mimeTypesMessage: 'Merci de télécharger une image valide (jpg, png, webp).'
+    )]
+    private ?UploadedFile $profileImageFile = null;
+
     /**
      * @var Collection<int, Outing>
      */
@@ -70,7 +81,7 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Outing::class, mappedBy: 'organizer')]
     private Collection $organizedOutings;
 
-    #[ORM\ManyToOne(inversedBy: 'participants')]
+    #[ORM\ManyToOne(targetEntity: Site::class, inversedBy: 'participants')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Site $site = null;
 
@@ -85,77 +96,79 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
-    public function getLastName(): string
+    public function getLastName(): ?string
     {
         return $this->lastName;
     }
 
-    public function setLastName(string $lastName): static
+    public function setLastName(?string $lastName): static
     {
         $this->lastName = $lastName;
 
         return $this;
     }
 
-    public function getFirstName(): string
+    public function getFirstName(): ?string
     {
         return $this->firstName;
     }
 
-    public function setFirstName(string $firstName): static
+    public function setFirstName(?string $firstName): static
     {
         $this->firstName = $firstName;
 
         return $this;
     }
 
-    public function getUsername(): string
+    public function getUsername(): ?string
     {
         return $this->username;
     }
 
-    public function setUsername(string $username): void
+    public function setUsername(?string $username): static
     {
         $this->username = $username;
+
+        return $this;
     }
 
-    public function getPhone(): string
+    public function getPhone(): ?string
     {
         return $this->phone;
     }
 
-    public function setPhone(string $phone): static
+    public function setPhone(?string $phone): static
     {
         $this->phone = $phone;
 
         return $this;
     }
 
-    public function getEmail(): string
+    public function getEmail(): ?string
     {
         return $this->email;
     }
 
-    public function setEmail(string $email): static
+    public function setEmail(?string $email): static
     {
         $this->email = $email;
 
         return $this;
     }
 
-    public function getPassword(): string
+    public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    public function setPassword(string $password): static
+    public function setPassword(?string $password): static
     {
         $this->password = $password;
 
         return $this;
     }
 
-    public function getAdministrator(): bool
+    public function isAdministrator(): bool
     {
         return $this->administrator;
     }
@@ -167,7 +180,7 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getActive(): bool
+    public function isActive(): bool
     {
         return $this->active;
     }
@@ -177,6 +190,26 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
         $this->active = $active;
 
         return $this;
+    }
+
+    public function getProfilePicture(): ?string
+    {
+        return $this->profilePicture;
+    }
+
+    public function setProfilePicture(?string $profilePicture): void
+    {
+        $this->profilePicture = $profilePicture;
+    }
+
+    public function getProfileImageFile(): ?UploadedFile
+    {
+        return $this->profileImageFile;
+    }
+
+    public function setProfileImageFile(?UploadedFile $profileImageFile): void
+    {
+        $this->profileImageFile = $profileImageFile;
     }
 
     public function getRoles(): array
@@ -257,7 +290,6 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-
     public function getSite(): ?Site
     {
         return $this->site;
@@ -268,10 +300,5 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
         $this->site = $site;
 
         return $this;
-    }
-  
-    public function isActive(): bool
-    {
-        return $this->active ?? false;
     }
 }

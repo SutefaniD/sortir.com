@@ -23,14 +23,17 @@ class Site
         max: 150,
         maxMessage: "Le nom du site ne doit pas avoir moins de 3 lettres et dépasser {{ limit }} caractères."
     )]
-    private string $name;
+    private ?string $name = null;
 
     /**
-     * @var Collection<int, Outing>
+     * @var Collection<int, Participant>
      */
     #[ORM\OneToMany(targetEntity: Participant::class, mappedBy: 'site')]
     private Collection $participants;
 
+    /**
+     * @var Collection<int, Outing>
+     */
     #[ORM\OneToMany(targetEntity: Outing::class, mappedBy: 'site')]
     private Collection $outings;
 
@@ -45,12 +48,12 @@ class Site
         return $this->id;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function setName(string $name): static
+    public function setName(?string $name): static
     {
         $this->name = $name;
 

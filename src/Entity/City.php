@@ -25,7 +25,7 @@ class City
     )]
     private ?string $name = null;
 
-    #[ORM\Column(length: 5, nullable: true)]
+    #[ORM\Column(length: 5, nullable: false)]
     #[Assert\Regex(
         pattern: '/^\d{5}$/',
         message: "Le code postal doit contenir exactement 5 chiffres."

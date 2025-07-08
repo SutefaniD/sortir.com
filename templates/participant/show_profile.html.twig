@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create participant{% endblock %}
+
+{% block css %}<link rel="stylesheet" href="{{ asset('assets/css/participant.css') }}">{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <h1>{{ user.username }}</h1>
+        <ul>
+            <li>Nom : {{ user.lastName }}</li>
+            <li>Prénom : {{ user.firstName }}</li>
+            <li>Téléphone : {{ user.phone }}</li>
+            <li>Email : {{ user.email }}</li>
+            <li>Site de rattachement : {{ user.site.name }}</li>
+        </ul>
+    </div>
+{% endblock %}

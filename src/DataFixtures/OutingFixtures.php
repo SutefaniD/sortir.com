@@ -38,14 +38,20 @@ class OutingFixtures extends Fixture implements DependentFixtureInterface
             $outing->setOutingDetails($faker->text(100));
 
             // Choix du status
-            // Si date future : à 70% ONGOING, sinon 20% CREATED, 10% CANCELLED
+            // Si date future : à 70% OPENED, sinon 20% CREATED, 5% CLOSED, 5% CANCELLED
             // Si date passée : à 80% PAST, sinon 20% CANCELLED
-            if ($startDate > $now) {
+            if ($startDate == $now) {
+                // Cas exact : maintenant
+                $outing->setStatus($statuses[StatusName::ONGOING->value]);
+
+            } elseif ($startDate > $now) {
                 $rand = $faker->randomFloat(2, 0, 1);
                 if ($rand <= 0.7) {
-                    $outing->setStatus($statuses[StatusName::ONGOING->value]);
+                    $outing->setStatus($statuses[StatusName::OPENED->value]);
                 } else if ($rand <= 0.9) {
                     $outing->setStatus($statuses[StatusName::CREATED->value]);
+                } elseif ($rand <= 0.95) {
+                    $outing->setStatus($statuses[StatusName::CLOSED->value]);
                 } else {
                     $outing->setStatus($statuses[StatusName::CANCELLED->value]);
                     $outing->setCancelReason($faker->sentence());

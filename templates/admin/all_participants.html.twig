@@ -6,7 +6,7 @@
 
 {% block main %}
     <div class="container">
-        <h2>Liste des participants</h2><a href="{{ path('admin_create_user') }}">Create participant</a>
+        <h2>Liste des participants</h2><a href="{{ path('admin_create_user') }}">Create participant</a><a href="{{ path('admin_import_users') }}">Importer des participants</a>
         {% for participant in participants %}
             <div class="participant-row">
                 <div class="participant-field">
