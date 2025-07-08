@@ -1,33 +1,49 @@
 {% extends 'base.html.twig' %}
+{% block title %}Afficher une sortie{% endblock %}
+
+{% block css %}<link rel="stylesheet" href="{{ asset('assets/css/out_detail.css') }}">{% endblock %}
 
 {% block main %}
-    <h1>{{ outing.name }}</h1>
+    <div class="main-content">
+        <h1>{{ outing.name }}</h1>
 
-    <!-- Détails de la sortie -->
+        <!-- Détails de la sortie -->
 
-    <p>Date de début : {{ outing.startingDateTime|date('d/m/Y H:i') }} </p>
-    <p>Date limite d'inscription : {{ outing.registrationDeadline|date('d/m/Y H:i') }}</p>
-    <p>Nombre maximum de participants : {{ outing.maxParticipants }}</p>
-    <p>Durée : {{ outing.duration }} minutes</p>
-    <p>Détails : {{ outing.outingDetails }}</p>
-    <p>Site et localisation</p>
-    <p>Site : {{ outing.site }}</p>
-    <p>Ville : {{ outing.location.city }}</p>
-    <p>Nom du lieu : {{ outing.location.name }}</p>
-    <p>Rue : {{ outing.location.street }}</p>
-    <p>Code postal : {{ outing.location.zipCode }}</p>
-    <p>Latitude : {{ outing.location.latitude }}</p>
-    <p>Longitude : {{ outing.location.longitude }}</p>
+        <p>Date et heure de la sortie : {{ outing.startingDateTime|date('d/m/Y H:i') }} </p>
+        <p>Date limite d'inscription : {{ outing.registrationDeadline|date('d/m/Y H:i') }}</p>
+        <p>Nombre de places : {{ outing.maxParticipants }}</p>
+        <p>Durée : {{ outing.duration }} minutes</p>
+        <p>Description et info : {{ outing.outingDetails }}</p>
 
-    {% if is_granted('CANCEL', outing) and outing.status.name != 'cancelled' %}
-        <a href="{{ path('outing_cancel', {'id': outing.id}) }}" class="btn btn-danger">Annuler</a>
-    {% endif %}
+        {# <p>Site : {{ outing.site.name }}</p>  #}
+        <p>Nom du lieu : {{ outing.location.name }}</p>
+        <p>Rue : {{ outing.location.street }}</p>
 
-    {% if app.user in outing.participants %}
-        <a href="{{ path('outing_unregister', {'id': outing.id}) }}" class="btn btn-warning">Se désister</a>
-    {% elseif outing.status.name == 'open' and outing.participants|length < outing.maxParticipants %}
-        <a href="{{ path('outing_register', {'id': outing.id}) }}" class="btn btn-success">S'inscrire</a>
-    {% endif %}
+        <p>Ville : {{ outing.location.city.name }}</p>
+    {#    <p>Code postal : {{ outing.location.zipCode }}</p>#}
+        <p>Latitude : {{ outing.location.latitude }}</p>
+        <p>Longitude : {{ outing.location.longitude }}</p>
+    {#  la partie concernante des inscrits#}
+        <h2>Liste des participants inscrits :</h2>
+        <table class="participants-table">
+            <thead>
+            <tr>
+                <th>Pseudo</th>
+                <th>Nom</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for participant in outing.participants %}
+                <tr>
+                    <td>{{ participant.username }}</td>
+                    <td>{{ participant.lastname }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-{% endblock %}
+    </div>
+
+    {% endblock %}
+
 
