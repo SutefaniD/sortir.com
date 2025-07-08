@@ -29,7 +29,7 @@ use Symfony\Component\Validator\Constraints;
 #[Route('/outing', name: "outing_")]
 final class OutingController extends AbstractController
 {
-    #[Route('/create', name: 'create')]
+    #[Route('/create', name: 'create', methods: ['GET', 'POST'])]
     public function create(Request $request, EntityManagerInterface $entityManager, StatusRepository $statusRepo): Response
     {
         $user = $this->getUser();
