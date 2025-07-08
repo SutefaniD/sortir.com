@@ -1,64 +1,26 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Annuler une sortie{% endblock %}
-
 {% block main %}
 
-        <h2>Annuler une sortie</h2>
-        <div class="outing">
+    <h2>Annuler une sortie</h2>
 
-            {{ form_start(form) }}
+    <div class="outing cancel-form">
 
-            <div style="display: flex; gap: 50px;">
-                <!-- Colonne gauche -->
-                <div style="flex: 1;">
-                    <div>
-                        {{ form_label(form.name) }}
-                        {{ form_widget(form.name) }}
-                    </div>
-                    <div>
-                        {{ form_label(form.startingDateTime) }}
-                        {{ form_widget(form.startingDateTime) }}
-                    </div>
-                     <div>
-                        {{ form_label(form.site) }}
-                        {{ form_widget(form.site) }}
-                    </div>
-                    <div>
-                        {{ form_label(form.location) }}
-                        {{ form_widget(form.location) }}
-                    </div>
-                </div>
-        
+        {{ form_start(form) }}
+
+
+        <div style="max-width: 600px; margin: 0 auto;">
+            <div class="mb-3">
+                {{ form_label(form.cancelReason) }}
+                {{ form_widget(form.cancelReason, {'attr': {'class': 'form-control', 'rows': 5}}) }}
+            </div>
+
+            <div style="display: flex; gap: 20px; justify-content: center; margin-top: 20px;">
+                {{ form_widget(form.submit, {'attr': {'class': 'btn btn-warning'}}) }}
+                <a href="{{ path('outing_detail', {'id': outing.id}) }}" class="btn btn-secondary">Retour</a>
             </div>
         </div>
 
-        <br>
-        <div style="display: flex; gap: 20px; justify-content: center;">
-            {{ form_widget(form.save) }}
-            <a href="{{ path('main_home') }}" class="btn btn-danger">Annuler</a>
-        </div>
         {{ form_end(form) }}
-        </div>
-    {% endblock %}
 
-
-
-
-    {# Affichage conditionnel des actions S'inscrire/se désister #}
-   
-        {% if app.user != outing.organizer %}
-            {% if outing.status.label == 'Ouverte' and outing.registrationDeadline > now %}
-                {% if not outing.participants.contains(user) %}
-                    <a href="{{ path('outing_subscribe', {id: outing.id}) }}" class="btn btn-success">S'inscrire</a>
-                {% else %}
-                    <a href="{{ path('outing_unsubscribe', {id: outing.id}) }}">Se désister</a>
-                {% endif %}
-            {% endif %}
-        {% endif %}
-    {% endif %}
-
-
+    </div>
 
 {% endblock %}
-
