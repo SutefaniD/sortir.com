@@ -156,7 +156,7 @@ final class ParticipantController extends AbstractController
         return $this->redirectToRoute('main_home');
     }
 
-    #[Route('/profiles/{id}', name: 'show_profile', methods: ['GET'])]
+    #[Route('/profile/{id}', name: 'show_profile', methods: ['GET'])]
     public function showProfile(int $id, EntityManagerInterface $entityManager, ParticipantRepository $participantRepository, TokenStorageInterface $tokenStorage, Request $request): Response {
         $user = $participantRepository->find($id);
 

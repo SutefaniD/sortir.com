@@ -46,3 +46,8 @@
 .create-participant button:hover {
     background-color: #0056b3;
 }
+
+/************************************************** Show profile **************************************************/
+ul li img {
+    height: 150px;
+}
