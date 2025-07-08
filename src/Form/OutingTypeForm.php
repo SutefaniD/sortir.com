@@ -64,16 +64,16 @@ class OutingTypeForm extends AbstractType
 //            ]);
         // les boutons d'envoie de formulaire'
 
-            ->add('saveCreated', SubmitType::class, [
+            ->add('create', SubmitType::class, [
             'label' => 'Enregistrer',
             'attr' => ['class' => 'btn btn-success']
              ])
-            ->add('saveOpened', SubmitType::class, [
+            ->add('publish', SubmitType::class, [
                 'label' => 'Publier la sortie',
                 'attr' => ['class' => 'btn btn-primary']
             ])
             ->add('cancel', SubmitType::class, [
-            'label' => 'Annuler la sortie',
+            'label' => 'Annuler',
             'attr' => ['class' => 'btn btn-primary']
             ]);
 //            ->add('delete', SubmitType::class, [

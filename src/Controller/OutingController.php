@@ -9,6 +9,7 @@ use App\Form\LocationForm;
 use App\Form\OutingTypeForm;
 use App\Repository\OutingRepository;
 use App\Repository\StatusRepository;
+use App\Service\OutingAuthorizationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -48,15 +49,13 @@ final class OutingController extends AbstractController
 
             try {
                 // Définir le statut selon le bouton cliqué
-                if ($form->get('publish')->isClicked()) {
+                if ($form->get('create')->isClicked()) {
+                    $outing->setStatus($statusRepo->findOneBy(['label' => 'Créée']));
+                } else if ($form->get('publish')->isClicked()) {
                     $outing->setStatus($statusRepo->findOneBy(['label' => 'Ouverte']));
                 } else {
-                    $outing->setStatus($statusRepo->findOneBy(['label' => 'Créée']));
+                    return $this->redirectToRoute('main_home');
                 }
-//                    $outing->setstartingDateTime(new \DateTime());
-//                    $outing->setregistrationDeadline(new \DateTime());
-
-              //  $outing->setStatus($statusRepo->findOneBy(['label' => 'Ouverte']));
 
                 $entityManager->persist($outing);
                 $entityManager->flush();
@@ -64,8 +63,6 @@ final class OutingController extends AbstractController
 
                 //redirige sur la page d'affichage de Sortie
                 return $this->redirectToRoute('main_home');
-             //   return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
-
                 }
                 catch (Exception $exception) {
                     $this->addFlash('warning', $exception->getMessage());
@@ -264,24 +261,33 @@ final class OutingController extends AbstractController
 //      Inscription/Desinscription des participants
 
     #[Route('/outing/register/{id}', name: 'register', requirements: ['id' => '\d+'])]
-    public function register(Outing $outing, EntityManagerInterface $em): Response {
+    public function register(
+        Outing $outing,
+        EntityManagerInterface $em,
+        OutingAuthorizationService $authorizationService
+    ): Response {
         $user = $this->getUser();
         $now = new \DateTime();
 
-        // Vérifications
-        if ($outing->getRegistrationDeadline() < $now) {
-            $this->addFlash('error', 'La date limite d\'inscription est dépassée');
-        } elseif ($outing->getParticipants()->count() >= $outing->getMaxParticipants()) {
-            $this->addFlash('error', 'Le nombre maximum de participants est atteint');
-        } elseif ($outing->getParticipants()->contains($user)) {
-            $this->addFlash('warning', 'Vous êtes déjà inscrit à cette sortie');
+
+        if (!$authorizationService->canUserRegister($outing, $user)) {
+            if ($authorizationService->isUserParticipant($outing, $user)) {
+                $this->addFlash('warning', 'Vous êtes déjà inscrit à cette sortie');
+            } else if ($authorizationService->isUserOrganizer($outing, $user)) {
+                $this->addFlash('error', 'L’organisateur ne peut pas s’inscrire à sa propre sortie');
+            } else if ($authorizationService->isStatusOpened($outing)) {
+                $this->addFlash('error', 'La sortie n’est pas ouverte aux inscriptions');
+            } else if ($outing->getRegistrationDeadline() < $now) {
+                $this->addFlash('error', 'La date limite d\'inscription est dépassée');
+            } else if ($outing->getParticipants()->count() >= $outing->getMaxParticipants()) {
+                $this->addFlash('error', 'Le nombre maximum de participants est atteint');
+            }
         } else {
             $outing->addParticipant($user);
             $em->flush();
             $this->addFlash('success', 'Inscription réussie !');
         }
 
-//        return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
         return $this->redirectToRoute('main_home');
     }
 
