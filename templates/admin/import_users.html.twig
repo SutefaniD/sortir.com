@@ -2,11 +2,16 @@
 
 {% block title %}Import participants{% endblock %}
 
-{% block css %}<link rel="stylesheet" href="{{ asset('assets/css/admin.css') }}">{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{{ asset('assets/css/admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/participant.css') }}">
+{% endblock %}
 
 {% block main %}
     <div class="container">
         <h2>Importer des participants</h2>
-        {{ form(form) }}
+        <div class="create-participant">
+            {{ form(form) }}
+        </div>
     </div>
 {% endblock %}

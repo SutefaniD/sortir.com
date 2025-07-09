@@ -329,6 +329,16 @@ final class OutingController extends AbstractController
         return $this->redirectToRoute('main_home');
     }
 
+    #[Route('/outing/publish/{id}', name: 'publish', requirements: ['id' => '\d+'])]
+    public function publish(Outing $outing, EntityManagerInterface $entityManager, StatusRepository $statusRepository): Response {
+        $outing->setStatus($statusRepository->findOneBy(['label' => 'Ouverte']));
+
+        $entityManager->persist($outing);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('main_home');
+    }
+
 
     #[Route('/create/location', name: 'create_location')]
     public function create_location(EntityManagerInterface $entityManager, Request $request): Response

@@ -31,7 +31,7 @@ class ParticipantForm extends AbstractType
                 ->add('site', EntityType::class, [
                     'class' => Site::class,
                     'choice_label' => 'name',
-                    'placeholder' => 'Choose a site',
+                    'placeholder' => '-- Veuillez choisir un site --',
                     'label' => 'Attachment site'
                 ])
                 ->add('profileImageFile', FileType::class, [

@@ -46,7 +46,8 @@ class OutingTypeForm extends AbstractType
                 'choice_label'  => function ($location) {
                     return $location->getName() . ', ' . $location->getStreet() . ' - ' . $location->getCity()->getName();
                 },
-                'label' => 'Lieux :'
+                'label' => 'Lieux :',
+                'placeholder' => '-- Veuillez choisir un lieu --'
             ])
             //->add('cancelReason', TextareaType::class, [
            //     "label" => "Motif :"

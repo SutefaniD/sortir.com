@@ -6,16 +6,38 @@
 
 {% block main %}
     <div class="container">
-        <h1>{{ user.username }}</h1>
-        <ul>
+        <div class="show-user-profile">
             {% if user.profilePicture %}
-                <li><img src="{{ user.profilePicture }}" alt=""></li>
+                <div class="profile-picture">
+                    <img src="{{ user.profilePicture }}" alt="Photo de profil de {{ user.username }}">
+                </div>
             {% endif %}
-            <li>Nom : {{ user.lastName }}</li>
-            <li>Prénom : {{ user.firstName }}</li>
-            <li>Téléphone : {{ user.phone }}</li>
-            <li>Email : {{ user.email }}</li>
-            <li>Site de rattachement : {{ user.site.name }}</li>
-        </ul>
+
+            <div class="profile-details">
+                <h1>{{ user.username }}</h1>
+                <ul>
+                    <li>
+                        <strong>Nom</strong>
+                        {{ user.lastName }}
+                    </li>
+                    <li>
+                        <strong>Prénom</strong>
+                        {{ user.firstName }}
+                    </li>
+                    <li>
+                        <strong>Téléphone</strong>
+                        {{ user.phone }}
+                    </li>
+                    <li>
+                        <strong>Email</strong>
+                        {{ user.email }}
+                    </li>
+                    <li>
+                        <strong>Site de rattachement</strong>
+                        {{ user.site.name }}
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
 {% endblock %}

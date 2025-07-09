@@ -49,11 +49,15 @@
                         </div>
                     {% endfor %}
                 </div>
-
                 <button class="btn btn-primary">Rechercher</button>
+
             </fieldset>
 
             {{ form_end(searchForm) }}
+        </section>
+
+        <section>
+            <a><button>Créer une sortie</button></a>
         </section>
 
         <section class="results">
@@ -103,7 +107,7 @@
                                 {% endif %}
 
                                 {% if outingAuth.canUserPublish(outing, user) %}
-                                    <a href="">Publier</a>
+                                    <a href="{{ path('outing_publish', {'id': outing.id}) }}">Publier</a>
                                 {% endif %}
 
                                 {% if outingAuth.canUserCancel(outing, user) %}
@@ -119,10 +123,6 @@
             {% else %}
                 <p>Aucune sortie trouvée.</p>
             {% endif %}
-        </section>
-
-        <section>
-            <a><button>Créer une sortie</button></a>
         </section>
 
     </main>

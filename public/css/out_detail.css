@@ -1,13 +1,76 @@
 /************************************************** Outing details**************************************************/
-main{
-    display:flex;
+main {
+    display: flex;
     flex-direction: column;
-    justify-items: center;
-    align-content: center;
-    width: 80%;
-    height: 100vh;
+    align-items: center;
+    padding: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: #fdfdfd;
 }
-p{
-    margin-top: 20px;
-    margin-bottom: 20px;
+
+/* ===== Outing Header ===== */
+.main-content h1 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+    text-align: center;
+}
+
+/* ===== Outing Info ===== */
+.main-content p {
+    margin: 0.7rem 0;
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.5;
+}
+
+.main-content p::before {
+    content: "• ";
+    color: #007bff;
+}
+
+/* ===== Section Titles ===== */
+.main-content h2 {
+    margin-top: 2rem;
+    font-size: 1.5rem;
+    color: #222;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 0.5rem;
+    width: 100%;
+}
+
+/* ===== Participants Table ===== */
+.participants-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.participants-table th,
+.participants-table td {
+    border: 1px solid #ccc;
+    padding: 0.75rem 1rem;
+    text-align: left;
+}
+
+.participants-table th {
+    background-color: #f0f0f0;
+    font-weight: 600;
+    color: #333;
+}
+
+.participants-table tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+.participants-table a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.participants-table a:hover {
+    text-decoration: underline;
 }
