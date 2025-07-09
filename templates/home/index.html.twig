@@ -31,10 +31,6 @@
                     </div>
                 </div>
                 <div class="form-right">
-{#                    {{ form_row(searchForm.isOrganizer) }}#}
-{#                    {{ form_row(searchForm.isParticipant) }}#}
-{#                    {{ form_row(searchForm.isNotParticipant) }}#}
-{#                    {{ form_row(searchForm.pastOutings) }}#}
                     {% for checkbox in [
                         searchForm.isOrganizer,
                         searchForm.isParticipant,
@@ -122,7 +118,7 @@
         </section>
 
         <section>
-            <a><button>Créer une sortie</button></a>
+            <a href="{{ path('outing_create') }}"><button>Créer une sortie</button></a>
         </section>
 
     </main>
