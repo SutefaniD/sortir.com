@@ -11,8 +11,8 @@
             {% if user.profilePicture %}
                 <li><img src="{{ user.profilePicture }}" alt=""></li>
             {% endif %}
-            <li>Nom : {{ user.lastName }}</li>
             <li>Prénom : {{ user.firstName }}</li>
+            <li>Nom : {{ user.lastName }}</li>
             <li>Téléphone : {{ user.phone }}</li>
             <li>Email : {{ user.email }}</li>
             <li>Site de rattachement : {{ user.site.name }}</li>

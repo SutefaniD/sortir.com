@@ -19,30 +19,40 @@ class ParticipantForm extends AbstractType
     {
         if ($options['include_profile']) {
             $builder
-                ->add('lastName', null, [
+                ->add('username', null, [
+                    'label' => 'Pseudo',
                     'attr' => [
                         'autofocus' => true,
-                    ]
+                        ]
                 ])
-                ->add('firstName')
-                ->add('username')
-                ->add('phone')
-                ->add('email')
+                ->add('firstName', null, [
+                    'label' => 'Prénom',
+                ])
+                ->add('lastName', null, [
+                    'label' => 'Nom',
+                ])
+                ->add('phone',null, [
+                'label' => 'Téléphone',
+                ])
+                ->add('email', null, [
+                    'label' => 'Email',
+                ])
                 ->add('site', EntityType::class, [
                     'class' => Site::class,
                     'choice_label' => 'name',
-                    'placeholder' => 'Choose a site',
-                    'label' => 'Attachment site'
+                    'placeholder' => 'Sélectionner un site',
+                    'label' => 'Site de rattachement'
                 ])
                 ->add('profileImageFile', FileType::class, [
-                    'label' => 'Photo de profil (JPG, PNG, WEBP)',
+                    'label' => 'Ma photo',
                     'mapped' => false,
                     'required' => false,
+                    'help' => 'Formats acceptés : JPG, PNG, WEBP (max 5 Mo)',
                     'constraints' => [
                         new File([
                             'maxSize' => '5M',
                             'mimeTypes' => ['image/jpeg', 'image/png',  'image/webp'],
-                            'mimeTypesMessage' => 'Merci de télécharger une image valide',
+                            'mimeTypesMessage' => 'Merci de télécharger une image valide (JPG, PNG, WEBP)',
                         ]),
                     ],
                 ]);
@@ -50,15 +60,19 @@ class ParticipantForm extends AbstractType
 
         if ($options['include_password']) {
             $builder
-                ->add('password', PasswordType::class)
+                ->add('password', PasswordType::class, [
+                    'label' => 'Mot de passe',
+                ])
                 -> add('confirmPassword', PasswordType::class, [
+                    'label' => 'Confirmation',
                     'mapped' => false,
                     'required' => true,
                 ]);
         }
 
-        $builder->add('submit', SubmitType::class)
-        ;
+        $builder->add('submit', SubmitType::class, [
+            'label' => 'Enregistrer'
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
