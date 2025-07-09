@@ -10,6 +10,7 @@ use App\Form\OutingTypeForm;
 use App\Repository\OutingRepository;
 use App\Repository\StatusRepository;
 use App\Service\OutingAuthorizationService;
+use App\Service\OutingStatusUpdater;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -264,13 +265,17 @@ final class OutingController extends AbstractController
     public function register(
         Outing $outing,
         EntityManagerInterface $em,
-        OutingAuthorizationService $authorizationService
+        OutingAuthorizationService $authorizationService,
+        OutingStatusUpdater $statusUpdater,
     ): Response {
         $user = $this->getUser();
         $now = new \DateTime();
 
+        // Update status
+        $this->$statusUpdater->updateStatus($outing);
 
-        if (!$authorizationService->canUserRegister($outing, $user)) {
+        // Register participant
+        if (!$this->$authorizationService->canUserRegister($outing, $user)) {
             if ($authorizationService->isUserParticipant($outing, $user)) {
                 $this->addFlash('warning', 'Vous êtes déjà inscrit à cette sortie');
             } else if ($authorizationService->isUserOrganizer($outing, $user)) {
@@ -292,19 +297,29 @@ final class OutingController extends AbstractController
     }
 
     #[Route('/outing/unregister/{id}', name: 'unregister', requirements: ['id' => '\d+'])]
-    public function unregister(Outing $outing, EntityManagerInterface $em): Response {
+    public function unregister(
+        Outing $outing,
+        EntityManagerInterface $em,
+        OutingAuthorizationService $authorizationService,
+        OutingStatusUpdater $statusUpdater,
+    ): Response {
         $user = $this->getUser();
         $now = new \DateTime();
 
-        if ($outing->getStartingDateTime() < $now) {
-            $this->addFlash('error', 'La sortie a déjà commencé');
-        } elseif (!$outing->getParticipants()->contains($user)) {
-            $this->addFlash('error', 'Vous n\'êtes pas inscrit à cette sortie');
+        if(!$authorizationService->canUserUnregister($outing, $user)) {
+            if ($outing->getStartingDateTime() < $now) {
+                $this->addFlash('error', 'La sortie a déjà commencé');
+            } elseif (!$outing->getParticipants()->contains($user)) {
+                $this->addFlash('error', 'Vous n\'êtes pas inscrit à cette sortie');
+            }
         } else {
             $outing->removeParticipant($user);
             $em->flush();
             $this->addFlash('success', 'Désinscription effectuée');
         }
+
+        // Update status (case outing was closed because maxParticipants reached)
+        $this->$statusUpdater->updateStatus($outing);
 
 //        return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
         return $this->redirectToRoute('main_home');
