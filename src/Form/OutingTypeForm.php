@@ -29,6 +29,7 @@ class OutingTypeForm extends AbstractType
             ->add('startingDateTime', DateTimeType::class, [
                 "label" => "Date et heure de la sortie : "
             ])
+
             ->add('registrationDeadline', DateType::class,[
                 "label" => "Date limite d'inscription : "
             ])
@@ -48,26 +49,15 @@ class OutingTypeForm extends AbstractType
                 },
                 'label' => 'Lieu :'
             ])
-            //->add('cancelReason', TextareaType::class, [
-           //     "label" => "Motif :"
-          //  ])
-
-//            ->add('site', EntityType::class, [
-//                'class' => Site::class,
-//                'choice_label' => 'name',
-//                'label' => 'Site :'
-//            ]);
 
 
-//            ->add('location', LocationForm::class, [
-//                'label' => false // formulaire imbriqué, labels gérés à l’intérieur
-//            ]);
-        // les boutons d'envoie de formulaire'
+        // ---------les boutons Enregistrer, Publier et Supprimer'
 
             ->add('create', SubmitType::class, [
             'label' => 'Enregistrer',
             'attr' => ['class' => 'btn btn-success']
              ])
+
             ->add('publish', SubmitType::class, [
                 'label' => 'Publier la sortie',
                 'attr' => ['class' => 'btn btn-primary']
@@ -76,10 +66,15 @@ class OutingTypeForm extends AbstractType
             'label' => 'Annuler',
             'attr' => ['class' => 'btn btn-primary']
             ]);
-//            ->add('delete', SubmitType::class, [
-//            'label' => 'Supprimer la sortie',
-//            'attr' => ['class' => 'btn btn-primary']
-//        ]);
+
+// 👉 Ajouter le bouton "delete" uniquement si l’option `can_delete` est true
+        if ($options['can_delete']) {
+            $builder
+                ->add('delete', SubmitType::class, [
+                'label' => 'Supprimer la sortie',
+                'attr' => ['class' => 'btn btn-danger']
+            ]);
+        }
 
     }
 
@@ -87,6 +82,7 @@ class OutingTypeForm extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Outing::class,
+            'can_delete' => false, // valeur par défaut
         ]);
     }
 }
