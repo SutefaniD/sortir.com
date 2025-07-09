@@ -306,20 +306,20 @@ final class OutingController extends AbstractController
         $user = $this->getUser();
         $now = new \DateTime();
 
-        if(!$authorizationService->canUserUnregister($outing, $user)) {
-            if ($outing->getStartingDateTime() < $now) {
-                $this->addFlash('error', 'La sortie a déjà commencé');
-            } elseif (!$outing->getParticipants()->contains($user)) {
-                $this->addFlash('error', 'Vous n\'êtes pas inscrit à cette sortie');
-            }
-        } else {
+       if (!$authorizationService->canUserUnregister($outing, $user)) {
+           if ($outing->getStartingDateTime() < $now) {
+               $this->addFlash('error', 'La sortie a déjà commencé');
+           } elseif (!$outing->getParticipants()->contains($user)) {
+               $this->addFlash('error', 'Vous n\'êtes pas inscrit à cette sortie');
+           }
+       } else {
             $outing->removeParticipant($user);
             $em->flush();
+            // Update status
+            $statusUpdater->updateStatus($outing);
             $this->addFlash('success', 'Désinscription effectuée');
-        }
 
-        // Update status (case outing was closed because maxParticipants reached)
-        $this->$statusUpdater->updateStatus($outing);
+       }
 
 //        return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
         return $this->redirectToRoute('main_home');
