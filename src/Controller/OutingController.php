@@ -23,6 +23,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/outing', name: "outing_")]
 final class OutingController extends AbstractController
 {
+    //-----------------------------Page de Création de Sortie----------------------------------------
     #[Route('/create', name: 'create', methods: ['GET', 'POST'])]
     public function create(Request $request, EntityManagerInterface $entityManager, StatusRepository $statusRepo): Response
     {
@@ -78,7 +79,7 @@ final class OutingController extends AbstractController
     }
 
 
-    // Page d'affichage de Sortie (par id)
+    //----------------------- Page d'Affichage de Sortie (par id)-------------------------------------------
 
     #[Route('/detail/{id}', name: 'detail', requirements: ['id' => '\d+'],  methods: ['GET'])]
     public function detail(int $id, OutingRepository $outingRepo): Response
@@ -120,11 +121,13 @@ final class OutingController extends AbstractController
         ]);
     }
 
-    // pour la modification de Sortie
+    //----------------------------------Modification de Sortie--------------------------------------
 
     #[Route('/update/{id}', name: 'update', requirements: ['id' => '\d+'])]
     public function update(Outing $outing, Request $request, StatusRepository $statusRepo, EntityManagerInterface $em): Response {
-        $form = $this->createForm(OutingTypeForm::class, $outing);
+        $form = $this->createForm(OutingTypeForm::class, $outing, [
+            'can_delete' => true,
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -161,53 +164,8 @@ final class OutingController extends AbstractController
         ]);
     }
 
-    /*
-     * #[Route('/update/{id}', name: 'update', requirements: ['id' => '\d+'])]
-    // TO DO ACCES LIMITE
-    //#[IsGranted('UPDATE', subject: 'outing')]
-    public function update(
-        Outing $outing,
-        Request $request,
-        StatusRepository       $statusRepo,
-        EntityManagerInterface $em
-    ): Response {
-        $form = $this->createForm(OutingTypeForm::class, $outing);
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Définir le statut selon le bouton cliqué
-
-            if ($form->get('publish')->isClicked()) {
-                $outing->setStatus($statusRepo->findOneBy(['label' => 'Ouverte']));
-            }
-           if ($form->get('cancel')->isClicked()) {
-               if ($outing->getStartingDateTime() > now\DateTime()) {
-                   $outing->setStatus($statusRepo->findOneBy(['label' => 'Annulée']));
-               }
-               else {
-                   $this->addFlash('danger', "La Sortie est en cours et ne peux pas être modifiée!");
-               }
-           }
-           else {
-                $outing->setStatus($statusRepo->findOneBy(['label' => 'Créée']));
-            }
-            $outing->setstartingDateTime(new \DateTime());
-            $outing->setregistrationDeadline(new \DateTime());
-
-            $em->flush();
-            $this->addFlash('success', 'Sortie modifiée avec succès !');
-
-            return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
-        }
-
-        return $this->render('outing/update.html.twig', [
-            'form' => $form,
-            'outing' => $outing
-        ]);
-    }
-
-*/
-// Annulation de Sortie
+//--------------------------------------- Annulation de Sortie-----------------------------------
     #[Route('/cancel/{id}', name: 'cancel', requirements: ['id' => '\d+'],  methods: ['GET', 'POST'] )]
     // #[IsGranted('CANCEL', subject: 'outing')]
 
@@ -257,14 +215,20 @@ final class OutingController extends AbstractController
     #[Route('/delete/{id}', name: 'delete', requirements: ['id' => '\d+'])]
     public function delete(Outing $outing, Request $request, EntityManagerInterface $entityManager): Response {
         $user = $this->getUser();
-        // Vérification de l'organisateur
-        if ($outing->getOrganizer() !== $user) {
-            throw $this->createAccessDeniedException("Vous n'êtes pas l'organisateur");
+
+        // Vérification des droits : organisateur OU admin
+        if (
+            $outing->getOrganizer() !== $user
+            //&&
+            //!in_array('ROLE_ADMIN', $user->getRoles())
+        ) {
+            throw $this->createAccessDeniedException("Vous n'avez pas le droit de supprimer cette sortie.");
         }
         // Vérification que la sortie n'a pas commencé
         if ($outing->getStartingDateTime() <= new \DateTime()) {
-            throw $this->createAccessDeniedException("Sortie déjà commencée");
+            throw $this->createAccessDeniedException("Impossible de supprimer une sortie déjà commencée.");
         }
+
         // Création d'un formulaire de confirmation simple
 //        $form = $this->createFormBuilder()
 //            ->add('confirm', SubmitType::class, ['label' => 'Confirmer la suppression'])
@@ -278,11 +242,7 @@ final class OutingController extends AbstractController
 
             return $this->redirectToRoute('main_home');
 //        }
-//        return $this->render('outing/delete.html.twig', [
-//            'form' => $form->createView(),
-//            'outing' => $outing,
-//        ]);
-
+//
 //        return $this->redirectToRoute('main_home');
     }
 
