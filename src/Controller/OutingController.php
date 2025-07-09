@@ -6,6 +6,7 @@ namespace App\Controller;
 use App\Entity\Location;
 use App\Entity\Outing;
 use App\Form\LocationForm;
+use App\Form\OutingLocationForm;
 use App\Form\OutingTypeForm;
 use App\Repository\OutingRepository;
 use App\Repository\StatusRepository;
@@ -17,6 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -25,6 +27,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/outing', name: "outing_")]
 final class OutingController extends AbstractController
 {
+
     #[Route('/create', name: 'create', methods: ['GET', 'POST'])]
     public function create(Request $request, EntityManagerInterface $entityManager, StatusRepository $statusRepo): Response
     {
@@ -41,44 +44,104 @@ final class OutingController extends AbstractController
             throw new \LogicException("L'utilisateur n'a pas de site associé.");
         }
 
-        $outing->setSite($outing->getOrganizer()->getSite());
+//        $outing->setSite($outing->getOrganizer()->getSite());
+        $outing->setSite($user->getSite());
 
-        $form = $this->createForm(OutingTypeForm::class, $outing);
+        $form = $this->createForm(OutingLocationForm::class, [
+            'outing' => $outing,
+            'location' => new Location()
+        ]);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $outingData = $form->get('outing')->getData();
+            $locationData = $form->get('location')->getData();
+
+            $outingData->setLocation($locationData);
 
             try {
                 // Définir le statut selon le bouton cliqué
-                if ($form->get('create')->isClicked()) {
+                if ($form->get('save')->isClicked()) {
                     $outing->setStatus($statusRepo->findOneBy(['label' => 'Créée']));
                 } else if ($form->get('publish')->isClicked()) {
                     $outing->setStatus($statusRepo->findOneBy(['label' => 'Ouverte']));
-                } else {
-                    return $this->redirectToRoute('main_home');
                 }
 
-                $entityManager->persist($outing);
+                $entityManager->persist($locationData);
+                $entityManager->persist($outingData);
                 $entityManager->flush();
-                $this->addFlash('success', 'Sortie créée avec succès !');
 
+                $this->addFlash('success', 'Sortie créée avec succès !');
                 //redirige sur la page d'affichage de Sortie
                 return $this->redirectToRoute('main_home');
-                }
-                catch (Exception $exception) {
-                    $this->addFlash('warning', $exception->getMessage());
+
+            } catch (Exception $exception) {
+                $this->addFlash('warning', 'Erreur lors de la création : ' . $exception->getMessage());
             }
         }
 
         return $this->render('outing/create.html.twig', [
-            'form' => $form
+            'form' => $form->createView()
         ]);
     }
 
 
+
+//    #[Route('/create', name: 'create', methods: ['GET', 'POST'])]
+//    public function create(Request $request, EntityManagerInterface $entityManager, StatusRepository $statusRepo): Response
+//    {
+//        $user = $this->getUser();
+//
+//        if (!$user) {
+//            throw $this->createAccessDeniedException("User is not logged in");
+//        }
+//
+//        $outing = new Outing();
+//        $outing->setOrganizer($user);
+//
+//        if (!$user->getSite()) {
+//            throw new \LogicException("L'utilisateur n'a pas de site associé.");
+//        }
+//
+//        $outing->setSite($outing->getOrganizer()->getSite());
+//
+//        $form = $this->createForm(OutingTypeForm::class, $outing);
+//        $form->handleRequest($request);
+//
+//        if ($form->isSubmitted() && $form->isValid()) {
+//
+//            try {
+//                // Définir le statut selon le bouton cliqué
+//                if ($form->get('create')->isClicked()) {
+//                    $outing->setStatus($statusRepo->findOneBy(['label' => 'Créée']));
+//                } else if ($form->get('publish')->isClicked()) {
+//                    $outing->setStatus($statusRepo->findOneBy(['label' => 'Ouverte']));
+//                } else {
+//                    return $this->redirectToRoute('main_home');
+//                }
+//
+//                $entityManager->persist($outing);
+//                $entityManager->flush();
+//                $this->addFlash('success', 'Sortie créée avec succès !');
+//
+//                //redirige sur la page d'affichage de Sortie
+//                return $this->redirectToRoute('main_home');
+//                }
+//                catch (Exception $exception) {
+//                    $this->addFlash('warning', $exception->getMessage());
+//            }
+//        }
+//
+//        return $this->render('outing/create.html.twig', [
+//            'form' => $form
+//        ]);
+//    }
+
+
     // Page d'affichage de Sortie (par id)
 
-    #[Route('/detail/{id}', name: 'detail', requirements: ['id' => '\d+'],  methods: ['GET'])]
+    #[Route('/detail/{id}', name: 'detail', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function detail(int $id, OutingRepository $outingRepo): Response
     {
         $outing = $outingRepo->find($id);
@@ -96,7 +159,8 @@ final class OutingController extends AbstractController
     // pour la modification de Sortie
 
     #[Route('/update/{id}', name: 'update', requirements: ['id' => '\d+'])]
-    public function update(Outing $outing, Request $request, StatusRepository $statusRepo, EntityManagerInterface $em): Response {
+    public function update(Outing $outing, Request $request, StatusRepository $statusRepo, EntityManagerInterface $em): Response
+    {
         $form = $this->createForm(OutingTypeForm::class, $outing);
         $form->handleRequest($request);
 
@@ -181,23 +245,24 @@ final class OutingController extends AbstractController
 
 */
 // Annulation de Sortie
-    #[Route('/cancel/{id}', name: 'cancel', requirements: ['id' => '\d+'],  methods: ['GET', 'POST'] )]
+    #[Route('/cancel/{id}', name: 'cancel', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
     // #[IsGranted('CANCEL', subject: 'outing')]
 
     public function cancel(
-        Outing $outing,
-        Request $request,
-        Security $security,
+        Outing                 $outing,
+        Request                $request,
+        Security               $security,
         EntityManagerInterface $em,
-        StatusRepository $statusRepo
-    ): Response {
+        StatusRepository       $statusRepo
+    ): Response
+    {
         $user = $security->getUser();
         //POUR TESTER EN BAS JE COMMENTE CETTE CONDITION
 
-   /*     if ($outing->getOrganizer() !== $user) {
-            throw $this->createAccessDeniedException("Vous n'êtes pas l'organisateur");
-        }
-    */
+        /*     if ($outing->getOrganizer() !== $user) {
+                 throw $this->createAccessDeniedException("Vous n'êtes pas l'organisateur");
+             }
+         */
         if ($outing->getStartingDateTime() <= new \DateTime()) {
             throw $this->createAccessDeniedException("Sortie a déjà commencée");
         }
@@ -226,9 +291,10 @@ final class OutingController extends AbstractController
 
     //Suppression de Sortie
 
-   // Suppression de Sortie
+    // Suppression de Sortie
     #[Route('/delete/{id}', name: 'delete', requirements: ['id' => '\d+'])]
-    public function delete(Outing $outing, Request $request, EntityManagerInterface $entityManager): Response {
+    public function delete(Outing $outing, Request $request, EntityManagerInterface $entityManager): Response
+    {
         $user = $this->getUser();
         // Vérification de l'organisateur
         if ($outing->getOrganizer() !== $user) {
@@ -244,12 +310,12 @@ final class OutingController extends AbstractController
 //            ->getForm();
 //        $form->handleRequest($request);
 //        if ($form->isSubmitted() && $form->isValid()) {
-            // Supprimer la sortie
-            $entityManager->remove($outing);
-            $entityManager->flush();
-            $this->addFlash('success', 'Sortie supprimée avec succès');
+        // Supprimer la sortie
+        $entityManager->remove($outing);
+        $entityManager->flush();
+        $this->addFlash('success', 'Sortie supprimée avec succès');
 
-            return $this->redirectToRoute('main_home');
+        return $this->redirectToRoute('main_home');
 //        }
 //        return $this->render('outing/delete.html.twig', [
 //            'form' => $form->createView(),
@@ -263,11 +329,12 @@ final class OutingController extends AbstractController
 
     #[Route('/outing/register/{id}', name: 'register', requirements: ['id' => '\d+'])]
     public function register(
-        Outing $outing,
-        EntityManagerInterface $em,
+        Outing                     $outing,
+        EntityManagerInterface     $em,
         OutingAuthorizationService $authorizationService,
-        OutingStatusUpdater $statusUpdater,
-    ): Response {
+        OutingStatusUpdater        $statusUpdater,
+    ): Response
+    {
         $user = $this->getUser();
         $now = new \DateTime();
 
@@ -298,51 +365,32 @@ final class OutingController extends AbstractController
 
     #[Route('/outing/unregister/{id}', name: 'unregister', requirements: ['id' => '\d+'])]
     public function unregister(
-        Outing $outing,
-        EntityManagerInterface $em,
+        Outing                     $outing,
+        EntityManagerInterface     $em,
         OutingAuthorizationService $authorizationService,
-        OutingStatusUpdater $statusUpdater,
-    ): Response {
+        OutingStatusUpdater        $statusUpdater,
+    ): Response
+    {
         $user = $this->getUser();
         $now = new \DateTime();
 
-       if (!$authorizationService->canUserUnregister($outing, $user)) {
-           if ($outing->getStartingDateTime() < $now) {
-               $this->addFlash('error', 'La sortie a déjà commencé');
-           } elseif (!$outing->getParticipants()->contains($user)) {
-               $this->addFlash('error', 'Vous n\'êtes pas inscrit à cette sortie');
-           }
-       } else {
+        if (!$authorizationService->canUserUnregister($outing, $user)) {
+            if ($outing->getStartingDateTime() < $now) {
+                $this->addFlash('error', 'La sortie a déjà commencé');
+            } elseif (!$outing->getParticipants()->contains($user)) {
+                $this->addFlash('error', 'Vous n\'êtes pas inscrit à cette sortie');
+            }
+        } else {
             $outing->removeParticipant($user);
             $em->flush();
             // Update status
             $statusUpdater->updateStatus($outing);
             $this->addFlash('success', 'Désinscription effectuée');
 
-       }
+        }
 
 //        return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
         return $this->redirectToRoute('main_home');
     }
 
-
-    #[Route('/create/location', name: 'create_location')]
-    public function create_location(EntityManagerInterface $entityManager, Request $request): Response
-    {
-        $location = new Location();
-        $form = $this->createForm(LocationForm::class, $location);
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($location);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('main_home');
-        }
-
-        return $this->render('outing/create_location.html.twig', ['form' => $form]);
-    }
-
 }
-

@@ -6,96 +6,87 @@
 
 
 {% block main %}
-    <div class="container">
-        <h2>Créer une sortie</h2>
-        <div class="create-participant">
-            {{ form(form) }}
-        </div>
-    </div>
+    <main>
+        <section class="filter">
+            {{  form_start(form) }}
 
-{#    <div class="outing">#}
+            <h2>Créer une sortie</h2>
 
-{#        {{ form_start(form) }}#}
-
-{#        <div style="display: flex; gap: 50px;">#}
-{#            <!-- Colonne gauche -->#}
-{#            <div style="flex: 1;">#}
-{#                <div>#}
-{#                    {{ form_label(form.name) }}#}
-{#                    {{ form_widget(form.name) }}#}
-{#                </div>#}
-{#                <div>#}
-{#                    {{ form_label(form.startingDateTime) }}#}
-{#                    {{ form_widget(form.startingDateTime) }}#}
-{#                </div>#}
-{#                <div>#}
-{#                    {{ form_label(form.registrationDeadline) }}#}
-{#                    {{ form_widget(form.registrationDeadline) }}#}
-{#                </div>#}
-{#                <div>#}
-{#                    {{ form_label(form.maxParticipants) }}#}
-{#                    {{ form_widget(form.maxParticipants) }}#}
-{#                </div>#}
-{#                <div>#}
-{#                    {{ form_label(form.duration) }} minutes#}
-{#                    {{ form_widget(form.duration) }}#}
-{#                </div>#}
-{#                <div>#}
-{#                    {{ form_label(form.outingDetails) }}#}
-{#                    {{ form_widget(form.outingDetails) }}#}
-{#                </div>#}
-{#                <div>#}
-{#                    {{ form_label(form.location) }}#}
-{#                    {{ form_widget(form.location) }}#}
-{#                </div>#}
-{#            </div>#}
-
-            <!-- Colonne droite -->
-{#            <div style="flex: 1;">#}
-{#                <div>#}
-{#                    {{ form_label(form.site) }}#}
-{#                    {{ form_widget(form.site) }}#}
-{#                </div>#}
-
-                <!-- Champs imbriqués de "location" -->
-{#                <div>#}
-{#                    {{ form_label(form.location.city) }}#}
-{#                    {{ form_widget(form.location.city) }}#}
-{#                </div>#}
-{#                <div>#}
-{#                    {{ form_label(form.location.name) }}#}
-{#                    {{ form_widget(form.location.name) }}#}
-{#                </div>#}
-{#                <div>#}
-{#                    {{ form_label(form.location.street) }}#}
-{#                    {{ form_widget(form.location.street) }}#}
-{#                </div>#}
-{#                <div>#}
-{#                    {{ form_label(form.location.zipCode) }}#}
-{#                    {{ form_widget(form.location.zipCode) }}#}
-{#                </div>#}
-{#                <div>#}
-{#                    {{ form_label(form.location.latitude) }}#}
-{#                    {{ form_widget(form.location.latitude) }}#}
-{#                </div>#}
-{#                <div>#}
-{#                    {{ form_label(form.location.longitude) }}#}
-{#                    {{ form_widget(form.location.longitude) }}#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-
-        <br>
-    <div style="display: flex; gap: 20px; justify-content: center;">
-{#        {{ form_widget(form.save) }}#}
-{#        {{ form_widget(form.publish) }}#}
-        <a href="{{ path('main_home') }}" class="btn btn-danger">Annuler</a>
-    </div>
+            <div class="form-left">
+                <div class="form-row">
+                    {{ form_row(form.outing.name) }}
+                </div>
+                <div class="form-row">
+                    {{ form_row(form.outing.startingDateTime) }}
+                </div>
+                <div class="form-row">
+                    {{ form_row(form.outing.registrationDeadline) }}
+                </div>
+                <div class="form-row">
+                    {{ form_row(form.outing.maxParticipants) }}
+                </div>
+                <div class="form-row">
+                    {{ form_label(form.outing.duration) }}
+                    {{ form_widget(form.outing.duration, {'attr': {'class': 'form-control w-auto'}}) }}
+                    <span>minutes</span>
+                </div>
+                <div class="form-row">
+                    {{ form_row(form.outing.outingDetails) }}
+                </div>
+            </div>
 
 
-        {{ form_end(form) }}
-        </div>
+            <div class="form-right">
+                <div class="form-row">
+                    {{ form_row(form.location.name) }}
+                </div>
+{#                <div class="form-row">#}
+{#                    {{ form_row(form.location.street) }}#}
+{#                </div>#}
+{#                <div class="form-row">#}
+{#                    {{ form_row(form.location.zipCode) }}#}
+{#                </div>#}
+{#                <div class="form-row">#}
+{#                    {{ form_row(form.location.latitude) }}#}
+{#                </div>#}
+{#                <div class="form-row">#}
+{#                    {{ form_row(form.location.longitude) }}#}
+{#                </div>#}
+            </div>
+
+            <div class="form-buttons">
+                {{ form_row(form.save) }}
+                {{ form_row(form.publish) }}
+                <a href="{{ path('main_home') }}" class="btn btn-danger">Annuler</a>
+            </div>
+
+            {{ form_end(form, {'render_rest': false})  }}
+
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const select = document.getElementById('location_select'); // adapte l'ID au champ réel
+                    if (!select) return;
+
+                    select.addEventListener('change', function() {
+                        const locationId = this.value;
+                        if (!locationId) return;
+
+                        fetch('/location/' + locationId + '/details')
+                            .then(response => response.json())
+                            .then(data => {
+                                // Remplir les champs du formulaire liés au lieu
+                                document.getElementById('location_name').value = data.name || '';
+                                document.getElementById('location_street').value = data.street || '';
+                                document.getElementById('location_postalCode').value = data.postalCode || '';
+                                document.getElementById('location_city').value = data.city || '';
+                                // etc.
+                            })
+                            .catch(error => console.error('Erreur AJAX:', error));
+                    });
+                });
+            </script>
+
+        </section>
+    </main>
 {% endblock %}
-
-
-
