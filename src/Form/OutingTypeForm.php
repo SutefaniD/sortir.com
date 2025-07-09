@@ -8,6 +8,7 @@ use App\Entity\Status;
 use App\Entity\Participant;
 use App\Entity\Outing;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -28,9 +29,8 @@ class OutingTypeForm extends AbstractType
             ->add('startingDateTime', DateTimeType::class, [
                 "label" => "Date et heure de la sortie : "
             ])
-
-            ->add('registrationDeadline', DateTimeType::class,[
-                "label" => "Date limite d'inscription: "
+            ->add('registrationDeadline', DateType::class,[
+                "label" => "Date limite d'inscription : "
             ])
             ->add('maxParticipants', IntegerType::class, [
                 "label" => "Nombre de places : "
@@ -39,7 +39,7 @@ class OutingTypeForm extends AbstractType
                 "label" => "Durée : "
             ])
             ->add('outingDetails', TextareaType::class, [
-                "label" => "Déscription et info : "
+                "label" => "Description et infos : "
             ])
             ->add('location', EntityType::class, [
                 'class' => Location::class,
@@ -65,18 +65,18 @@ class OutingTypeForm extends AbstractType
 //            ]);
         // les boutons d'envoie de formulaire'
 
-            ->add('save', SubmitType::class, [
+            ->add('create', SubmitType::class, [
             'label' => 'Enregistrer',
             'attr' => ['class' => 'btn btn-success']
              ])
             ->add('publish', SubmitType::class, [
                 'label' => 'Publier la sortie',
                 'attr' => ['class' => 'btn btn-primary']
+            ])
+            ->add('cancel', SubmitType::class, [
+            'label' => 'Annuler',
+            'attr' => ['class' => 'btn btn-primary']
             ]);
-//            ->add('cancel', SubmitType::class, [
-//            'label' => 'Annuler la sortie',
-//            'attr' => ['class' => 'btn btn-primary']
-//            ])
 //            ->add('delete', SubmitType::class, [
 //            'label' => 'Supprimer la sortie',
 //            'attr' => ['class' => 'btn btn-primary']

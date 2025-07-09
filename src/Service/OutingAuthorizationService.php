@@ -107,9 +107,11 @@ class OutingAuthorizationService
             return false;
         }
 
+        $now = new \DateTime();
         return $this->isStatusOpened($outing)
             && !$this->isUserParticipant($outing, $user)
-            && $outing->getParticipants()->count() < $outing->getMaxParticipants();
+            && $outing->getParticipants()->count() < $outing->getMaxParticipants()
+            && $outing->getRegistrationDeadline() >= $now; // registration until midnight of deadline date
     }
 
     /**
