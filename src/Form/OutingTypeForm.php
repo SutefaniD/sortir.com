@@ -1,11 +1,7 @@
 <?php
 
 namespace App\Form;
-use App\Form\LocationForm;
 use App\Entity\Location;
-use App\Entity\Site;
-use App\Entity\Status;
-use App\Entity\Participant;
 use App\Entity\Outing;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -40,47 +36,32 @@ class OutingTypeForm extends AbstractType
             ])
             ->add('outingDetails', TextareaType::class, [
                 "label" => "Description et infos : "
-            ])
-            ->add('location', EntityType::class, [
-                'class' => Location::class,
-                'choice_label'  => function ($location) {
-                    return $location->getName() . ', ' . $location->getStreet() . ' - ' . $location->getCity()->getName();
-                },
-                'label' => 'Lieux :',
-                'placeholder' => '-- Veuillez choisir un lieu --'
-            ])
-            //->add('cancelReason', TextareaType::class, [
-           //     "label" => "Motif :"
-          //  ])
-
-//            ->add('site', EntityType::class, [
-//                'class' => Site::class,
-//                'choice_label' => 'name',
-//                'label' => 'Site :'
-//            ]);
-
-
-//            ->add('location', LocationForm::class, [
-//                'label' => false // formulaire imbriqué, labels gérés à l’intérieur
-//            ]);
-        // les boutons d'envoie de formulaire'
-
-            ->add('create', SubmitType::class, [
-            'label' => 'Enregistrer',
-            'attr' => ['class' => 'btn btn-success']
-             ])
-            ->add('publish', SubmitType::class, [
-                'label' => 'Publier la sortie',
-                'attr' => ['class' => 'btn btn-primary']
-            ])
-            ->add('cancel', SubmitType::class, [
-            'label' => 'Annuler',
-            'attr' => ['class' => 'btn btn-primary']
             ]);
-//            ->add('delete', SubmitType::class, [
-//            'label' => 'Supprimer la sortie',
+
+        // ---------les boutons Enregistrer, Publier et Supprimer'
+
+//            ->add('create', SubmitType::class, [
+//            'label' => 'Enregistrer',
+//            'attr' => ['class' => 'btn btn-success']
+//             ])
+//
+//            ->add('publish', SubmitType::class, [
+//                'label' => 'Publier la sortie',
+//                'attr' => ['class' => 'btn btn-primary']
+//            ])
+//            ->add('cancel', SubmitType::class, [
+//            'label' => 'Annuler',
 //            'attr' => ['class' => 'btn btn-primary']
-//        ]);
+//            ]);
+
+// 👉 Ajouter le bouton "delete" uniquement si l’option `can_delete` est true
+//        if ($options['can_delete']) {
+//            $builder
+//                ->add('delete', SubmitType::class, [
+//                'label' => 'Supprimer la sortie',
+//                'attr' => ['class' => 'btn btn-danger']
+//            ]);
+//        }
 
     }
 
@@ -88,6 +69,7 @@ class OutingTypeForm extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Outing::class,
+//            'can_delete' => false, // valeur par défaut
         ]);
     }
 }

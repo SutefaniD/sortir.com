@@ -27,6 +27,8 @@ h1{
     border: 1px;
     border-radius: 8px;
 }
-a{
-
+.form_errors{
+    color: darkred;
+    font-size: 0.875em;
+    margin-top: 0.25rem;
 }
