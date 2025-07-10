@@ -48,7 +48,6 @@ class OutingTypeForm extends AbstractType
                 'label' => 'Lieux :'
             ])
 
-
         // ---------les boutons Enregistrer, Publier et Supprimer'
 
             ->add('save', SubmitType::class, [

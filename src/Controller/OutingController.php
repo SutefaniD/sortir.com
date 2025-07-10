@@ -1,14 +1,15 @@
 <?php
 
-
 namespace App\Controller;
 
 use App\Entity\Location;
 use App\Entity\Outing;
+use App\Entity\Participant;
 use App\Form\LocationForm;
 use App\Form\OutingTypeForm;
 use App\Repository\OutingRepository;
 use App\Repository\StatusRepository;
+use App\Repository\ParticipantRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,7 +19,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-
 
 #[Route('/outing', name: "outing_")]
 final class OutingController extends AbstractController
@@ -54,10 +54,6 @@ final class OutingController extends AbstractController
                 } else {
                     $outing->setStatus($statusRepo->findOneBy(['label' => 'Créée']));
                 }
-//                    $outing->setstartingDateTime(new \DateTime());
-//                    $outing->setregistrationDeadline(new \DateTime());
-
-              //  $outing->setStatus($statusRepo->findOneBy(['label' => 'Ouverte']));
 
                 $entityManager->persist($outing);
                 $entityManager->flush();
@@ -179,11 +175,14 @@ final class OutingController extends AbstractController
         $user = $security->getUser();
         //POUR TESTER EN BAS JE COMMENTE CETTE CONDITION
 
-   /*     if ($outing->getOrganizer() !== $user) {
-            throw $this->createAccessDeniedException("Vous n'êtes pas l'organisateur");
+        if ($outing->getOrganizer() !== $user &&
+            !$user->isAdministrator()) {
+            throw $this->createAccessDeniedException("Vous n'êtes pas l'organisateur ni administrateur");
         }
-    */
-        if ($outing->getStartingDateTime() <= new \DateTime()) {
+
+
+        if ($outing->getStartingDateTime() <= new \DateTime() &&
+            !$this->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException("Sortie a déjà commencée");
         }
 
