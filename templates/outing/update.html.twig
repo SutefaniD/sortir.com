@@ -11,28 +11,46 @@
 
         {{ form_start(form) }}
 
+        {# Affichage des erreurs globales du formulaire #}
+        {% if form.vars.errors|length > 0 %}
+            <div class="alert alert-danger">
+                {{ form_errors(form) }}
+            </div>
+        {% endif %}
+
         <div style="display: flex; gap: 50px;">
+
             <!-- Colonne gauche -->
             <div style="flex: 1;">
                 <div>
                     {{ form_label(form.name) }}
                     {{ form_widget(form.name) }}
+                    {{ form_errors(form.name) }}
+
                 </div>
                 <div>
                     {{ form_label(form.startingDateTime) }}
                     {{ form_widget(form.startingDateTime) }}
+                    {{ form_errors(form.startingDateTime) }}
+
                 </div>
                 <div>
                     {{ form_label(form.registrationDeadline) }}
                     {{ form_widget(form.registrationDeadline) }}
+                    {{ form_errors(form.registrationDeadline) }}
+
                 </div>
                 <div>
                     {{ form_label(form.maxParticipants) }}
                     {{ form_widget(form.maxParticipants) }}
+                    {{ form_errors(form.maxParticipants) }}
+
                 </div>
                 <div>
                     {{ form_label(form.duration) }} minutes
                     {{ form_widget(form.duration) }}
+                    {{ form_errors(form.duration) }}
+
                 </div>
                 <div>
                     {{ form_label(form.outingDetails) }}
@@ -42,6 +60,7 @@
                     {{ form_label(form.location) }}
                     {{ form_widget(form.location) }}
                 </div>
+
 
             </div>
 
@@ -84,16 +103,8 @@
     <div style="display: flex; gap: 20px; justify-content: center;">
         {{ form_widget(form.save) }}
         {{ form_widget(form.publish) }}
-        {#{{ form_widget(form.delete) }}#}
-{#        //{{ form_widget(form.cancel) }}#}
-         {% if app.user %}
-            {% if app.user == outing.organizer and outing.status.label in ['Créée', 'Ouverte'] %}
-                <a href="{{ path('outing_cancel', {id: outing.id}) }}" class="btn btn-danger">Annuler la sortie</a>
-            {% endif %}
-         {% endif %}
-{#        {{ form_widget(form.delete) }}#}
-
-
+        {{ form_widget(form.delete) }}
+         <a href="{{ path('outing_cancel', {id: outing.id}) }}" class="btn btn-danger">Annuler la sortie</a>
     </div>
 
     {{ form_end(form) }}

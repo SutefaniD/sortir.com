@@ -38,33 +38,38 @@ class OutingTypeForm extends AbstractType
                 "label" => "Description et infos : "
             ]);
 
+        // ---------les boutons Enregistrer, Publier et Supprimer'
 
-
-//            ->add('location', EntityType::class, [
-//                'class' => Location::class,
-//                'choice_label'  => function ($location) {
-//                    return $location->getName() . ' - ' . $location->getCity()->getName();
-//                },
-//                'label' => 'Lieu :'
-//            ]);
-
-            // les boutons d'envoie de formulaire'
-
-//            ->add('save', SubmitType::class, [
-//                'label' => 'Enregistrer',
-//                'attr' => ['class' => 'btn btn-success']
-//            ])
+//            ->add('create', SubmitType::class, [
+//            'label' => 'Enregistrer',
+//            'attr' => ['class' => 'btn btn-success']
+//             ])
+//
 //            ->add('publish', SubmitType::class, [
 //                'label' => 'Publier la sortie',
 //                'attr' => ['class' => 'btn btn-primary']
+//            ])
+//            ->add('cancel', SubmitType::class, [
+//            'label' => 'Annuler',
+//            'attr' => ['class' => 'btn btn-primary']
 //            ]);
+
+// 👉 Ajouter le bouton "delete" uniquement si l’option `can_delete` est true
+//        if ($options['can_delete']) {
+//            $builder
+//                ->add('delete', SubmitType::class, [
+//                'label' => 'Supprimer la sortie',
+//                'attr' => ['class' => 'btn btn-danger']
+//            ]);
+//        }
+
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Outing::class,
+//            'can_delete' => false, // valeur par défaut
         ]);
     }
-
 }
