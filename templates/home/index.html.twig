@@ -90,28 +90,38 @@
                             </td>
                             <td><a href="{{ path('participant_show_profile', {'id': outing.organizer.id}) }}">{{ outing.organizer.username }} / {{ outing.organizer.firstname|capitalize }} {{ outing.organizer.lastName|slice(0,1)|upper }}.</a></td>
                             <td>
-                                {% if outingAuth.canUserDisplay(outing, user) %}
+                                {% if outingAuth.canUserDisplay(outing, user) and not outingAuth.isUserAdmin(user) %}
                                     <a href="{{ path('outing_detail', {'id': outing.id}) }}">Afficher</a>
                                 {% endif %}
 
-                                {% if outingAuth.canUserUnregister(outing, user) %}
+                                {% if outingAuth.canUserUnregister(outing, user) and not outingAuth.isUserAdmin(user) %}
                                     <a href="{{ path('outing_unregister', {'id': outing.id}) }}">Se désister</a>
                                 {% endif %}
 
-                                {% if outingAuth.canUserRegister(outing, user) %}
+                                {% if outingAuth.canUserRegister(outing, user) and not outingAuth.isUserAdmin(user) %}
                                     <a href="{{ path('outing_register', {'id': outing.id}) }}">S'inscrire</a>
                                 {% endif %}
 
-                                {% if outingAuth.canUserUpdate(outing, user) %}
+                                {% if outingAuth.canUserUpdate(outing, user) and not outingAuth.isUserAdmin(user) %}
                                     <a href="{{ path('outing_update', {'id': outing.id}) }}">Modifier</a>
                                 {% endif %}
 
-                                {% if outingAuth.canUserPublish(outing, user) %}
+                                {% if outingAuth.canUserPublish(outing, user) and not outingAuth.isUserAdmin(user) %}
                                     <a href="{{ path('outing_publish', {'id': outing.id}) }}">Publier</a>
                                 {% endif %}
 
-                                {% if outingAuth.canUserCancel(outing, user) %}
+                                {% if outingAuth.canUserCancel(outing, user) and not outingAuth.isUserAdmin(user) %}
                                     <a href="{{ path('outing_cancel', {'id': outing.id}) }}">Annuler</a>
+                                {% endif %}
+
+                                {% if outingAuth.isUserAdmin(user) %}
+                                    <a href="{{ path('outing_detail', {'id': outing.id}) }}">Afficher</a>
+                                    {% if outing.status.label.value is not same as('Annulée') and outing.status.label.value is not same as('Historisée') %}
+                                        <a href="{{ path('outing_cancel', {'id': outing.id}) }}">Annuler</a>
+                                    {% endif %}
+                                    {% if outing.status.label.value is not same as('Historisée') %}
+                                        <a href="{{ path('outing_archive', {'id': outing.id}) }}">Archiver</a>
+                                    {% endif %}
                                 {% endif %}
                             </td>
                         </tr>

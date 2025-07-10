@@ -16,6 +16,10 @@ class OutingAuthorizationService
         return $outing->getParticipants()->contains($user);
     }
 
+    public function isUserAdmin(Participant $user): bool {
+        return $user->isAdministrator();
+    }
+
     public function isStatusCreated(Outing $outing) : bool {
         return $outing->getStatus()->getLabel() === StatusName::CREATED;
     }

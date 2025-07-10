@@ -242,13 +242,21 @@ final class OutingController extends AbstractController
 
             $em->flush();
             $this->addFlash('info', 'Sortie annulée avec succès');
-            return $this->redirectToRoute('outing_list');
+            return $this->redirectToRoute('main_home');
         }
 
         return $this->render('outing/cancel.html.twig', [
             'form' => $form,
             'outing' => $outing,
         ]);
+    }
+
+    #[Route('/archive/{id}', name: 'archive', requirements: ['id' => '\d+'],  methods: 'GET' )]
+    public function archive(Outing $outing, EntityManagerInterface $entityManager, StatusRepository $statusRepo): Response {
+        $outing->setStatus($statusRepo->findOneBy(['label' => 'Historisée']));
+        $entityManager->flush();
+
+        return $this->redirectToRoute('main_home');
     }
 
     //Suppression de Sortie
