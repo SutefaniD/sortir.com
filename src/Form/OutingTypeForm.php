@@ -47,7 +47,8 @@ class OutingTypeForm extends AbstractType
                 'choice_label'  => function ($location) {
                     return $location->getName() . ', ' . $location->getStreet() . ' - ' . $location->getCity()->getName();
                 },
-                'label' => 'Lieu :'
+                'label' => 'Lieux :',
+                'placeholder' => '-- Veuillez choisir un lieu --'
             ])
 
 

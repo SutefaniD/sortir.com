@@ -29,7 +29,8 @@ class LocationForm extends AbstractType
             ->add('city', EntityType::class, [
                 'class' => City::class,
                 'choice_label' => 'name',
-                'label' => 'Ville'
+                'label' => 'Ville',
+                'placeholder' => '-- Veuillez choisir une ville --'
             ])
             ->add('street', TextType::class, [
                 'label' => 'Rue'
