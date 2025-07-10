@@ -9,8 +9,6 @@ use App\Form\LocationForm;
 use App\Form\OutingTypeForm;
 use App\Repository\OutingRepository;
 use App\Repository\StatusRepository;
-use App\Service\OutingAuthorizationService;
-use App\Service\OutingStatusUpdater;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -51,13 +49,15 @@ final class OutingController extends AbstractController
 
             try {
                 // Définir le statut selon le bouton cliqué
-                if ($form->get('create')->isClicked()) {
-                    $outing->setStatus($statusRepo->findOneBy(['label' => 'Créée']));
-                } else if ($form->get('publish')->isClicked()) {
+                if ($form->get('publish')->isClicked()) {
                     $outing->setStatus($statusRepo->findOneBy(['label' => 'Ouverte']));
                 } else {
-                    return $this->redirectToRoute('main_home');
+                    $outing->setStatus($statusRepo->findOneBy(['label' => 'Créée']));
                 }
+//                    $outing->setstartingDateTime(new \DateTime());
+//                    $outing->setregistrationDeadline(new \DateTime());
+
+                //  $outing->setStatus($statusRepo->findOneBy(['label' => 'Ouverte']));
 
                 $entityManager->persist($outing);
                 $entityManager->flush();
@@ -65,9 +65,11 @@ final class OutingController extends AbstractController
 
                 //redirige sur la page d'affichage de Sortie
                 return $this->redirectToRoute('main_home');
-                }
-                catch (Exception $exception) {
-                    $this->addFlash('warning', $exception->getMessage());
+                //   return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
+
+            }
+            catch (Exception $exception) {
+                $this->addFlash('warning', $exception->getMessage());
             }
         }
 
@@ -94,10 +96,32 @@ final class OutingController extends AbstractController
     }
 
 
+// pour création d'une page Liste de Sorties (lecture)
+    #[Route('/list', name: 'list')]
+    public function list(
+        OutingRepository $outingRepo,
+        Request $request
+    ): Response {
+        $user = $this->getUser();
+        $siteFilter = $request->query->get('site');
+        $now = new \DateTime();
 
+        // Récupération avec filtres
+        //pour tester pour instant
+        $outings = $outingRepo->findAll();
+        /* code pour remplacer test du haut
+        $outings = $outingRepo->findAllWithFilters(
+            $user->getId(),
+            $siteFilter
+        );
+*/
+        return $this->render('outing/list.html.twig', [
+            'outings' => $outings,
+            'now' => $now
+        ]);
+    }
 
-
-     //----------------------------------Modification de Sortie--------------------------------------
+    //----------------------------------Modification de Sortie--------------------------------------
 
     #[Route('/update/{id}', name: 'update', requirements: ['id' => '\d+'])]
     public function update(Outing $outing, Request $request, StatusRepository $statusRepo, EntityManagerInterface $em): Response {
@@ -155,10 +179,10 @@ final class OutingController extends AbstractController
         $user = $security->getUser();
         //POUR TESTER EN BAS JE COMMENTE CETTE CONDITION
 
-   /*     if ($outing->getOrganizer() !== $user) {
-            throw $this->createAccessDeniedException("Vous n'êtes pas l'organisateur");
-        }
-    */
+        /*     if ($outing->getOrganizer() !== $user) {
+                 throw $this->createAccessDeniedException("Vous n'êtes pas l'organisateur");
+             }
+         */
         if ($outing->getStartingDateTime() <= new \DateTime()) {
             throw $this->createAccessDeniedException("Sortie a déjà commencée");
         }
@@ -187,7 +211,7 @@ final class OutingController extends AbstractController
 
     //Suppression de Sortie
 
-   // Suppression de Sortie
+    // Suppression de Sortie
     #[Route('/delete/{id}', name: 'delete', requirements: ['id' => '\d+'])]
     public function delete(Outing $outing, Request $request, EntityManagerInterface $entityManager): Response {
         $user = $this->getUser();
@@ -211,12 +235,12 @@ final class OutingController extends AbstractController
 //            ->getForm();
 //        $form->handleRequest($request);
 //        if ($form->isSubmitted() && $form->isValid()) {
-            // Supprimer la sortie
-            $entityManager->remove($outing);
-            $entityManager->flush();
-            $this->addFlash('success', 'Sortie supprimée avec succès');
+        // Supprimer la sortie
+        $entityManager->remove($outing);
+        $entityManager->flush();
+        $this->addFlash('success', 'Sortie supprimée avec succès');
 
-            return $this->redirectToRoute('main_home');
+        return $this->redirectToRoute('main_home');
 //        }
 //
 //        return $this->redirectToRoute('main_home');
@@ -225,64 +249,41 @@ final class OutingController extends AbstractController
 //      Inscription/Desinscription des participants
 
     #[Route('/outing/register/{id}', name: 'register', requirements: ['id' => '\d+'])]
-    public function register(
-        Outing $outing,
-        EntityManagerInterface $em,
-        OutingAuthorizationService $authorizationService,
-        OutingStatusUpdater $statusUpdater,
-    ): Response {
+    public function register(Outing $outing, EntityManagerInterface $em): Response {
         $user = $this->getUser();
         $now = new \DateTime();
 
-        // Update status
-        $this->$statusUpdater->updateStatus($outing);
-
-        // Register participant
-        if (!$this->$authorizationService->canUserRegister($outing, $user)) {
-            if ($authorizationService->isUserParticipant($outing, $user)) {
-                $this->addFlash('warning', 'Vous êtes déjà inscrit à cette sortie');
-            } else if ($authorizationService->isUserOrganizer($outing, $user)) {
-                $this->addFlash('error', 'L’organisateur ne peut pas s’inscrire à sa propre sortie');
-            } else if ($authorizationService->isStatusOpened($outing)) {
-                $this->addFlash('error', 'La sortie n’est pas ouverte aux inscriptions');
-            } else if ($outing->getRegistrationDeadline() < $now) {
-                $this->addFlash('error', 'La date limite d\'inscription est dépassée');
-            } else if ($outing->getParticipants()->count() >= $outing->getMaxParticipants()) {
-                $this->addFlash('error', 'Le nombre maximum de participants est atteint');
-            }
+        // Vérifications
+        if ($outing->getRegistrationDeadline() < $now) {
+            $this->addFlash('error', 'La date limite d\'inscription est dépassée');
+        } elseif ($outing->getParticipants()->count() >= $outing->getMaxParticipants()) {
+            $this->addFlash('error', 'Le nombre maximum de participants est atteint');
+        } elseif ($outing->getParticipants()->contains($user)) {
+            $this->addFlash('warning', 'Vous êtes déjà inscrit à cette sortie');
         } else {
             $outing->addParticipant($user);
             $em->flush();
             $this->addFlash('success', 'Inscription réussie !');
         }
 
+//        return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
         return $this->redirectToRoute('main_home');
     }
 
     #[Route('/outing/unregister/{id}', name: 'unregister', requirements: ['id' => '\d+'])]
-    public function unregister(
-        Outing $outing,
-        EntityManagerInterface $em,
-        OutingAuthorizationService $authorizationService,
-        OutingStatusUpdater $statusUpdater,
-    ): Response {
+    public function unregister(Outing $outing, EntityManagerInterface $em): Response {
         $user = $this->getUser();
         $now = new \DateTime();
 
-       if (!$authorizationService->canUserUnregister($outing, $user)) {
-           if ($outing->getStartingDateTime() < $now) {
-               $this->addFlash('error', 'La sortie a déjà commencé');
-           } elseif (!$outing->getParticipants()->contains($user)) {
-               $this->addFlash('error', 'Vous n\'êtes pas inscrit à cette sortie');
-           }
-       } else {
+        if ($outing->getStartingDateTime() < $now) {
+            $this->addFlash('error', 'La sortie a déjà commencé');
+        } elseif (!$outing->getParticipants()->contains($user)) {
+            $this->addFlash('error', 'Vous n\'êtes pas inscrit à cette sortie');
+        } else {
             $outing->removeParticipant($user);
             $em->flush();
-            // Update status
-            $statusUpdater->updateStatus($outing);
             $this->addFlash('success', 'Désinscription effectuée');
-
-       }
+        }
 
 //        return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
         return $this->redirectToRoute('main_home');
