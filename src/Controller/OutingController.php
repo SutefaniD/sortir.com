@@ -44,8 +44,9 @@ final class OutingController extends AbstractController
             throw new \LogicException("L'utilisateur n'a pas de site associé.");
         }
 
-//        $outing->setSite($outing->getOrganizer()->getSite());
         $outing->setSite($user->getSite());
+
+        $location = new Location();
 
         $form = $this->createForm(OutingLocationForm::class, [
             'outing' => $outing,
@@ -55,25 +56,32 @@ final class OutingController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $outingData = $form->get('outing')->getData();
-            $locationData = $form->get('location')->getData();
+            $outing = $form->get('outing')->getData();
+            $existingLocation = $form->get('chooseLocation')->getData();
+            $newLocation = $form->get('newLocation')->getData();
 
-            $outingData->setLocation($locationData);
+            // Check if a location was selected
+            if ($existingLocation) {
+                $outing->setLocation($existingLocation);
+            } else {
+                // Persist the new location
+                $entityManager->persist($newLocation);
+                $outing->setLocation($newLocation);
+            }
 
             try {
-                // Définir le statut selon le bouton cliqué
-                if ($form->get('save')->isClicked()) {
+                // Define status when button is clicked
+                if ($form->get('create')->isClicked()) {
                     $outing->setStatus($statusRepo->findOneBy(['label' => 'Créée']));
                 } else if ($form->get('publish')->isClicked()) {
                     $outing->setStatus($statusRepo->findOneBy(['label' => 'Ouverte']));
                 }
 
-                $entityManager->persist($locationData);
-                $entityManager->persist($outingData);
+                $entityManager->persist($outing);
                 $entityManager->flush();
 
                 $this->addFlash('success', 'Sortie créée avec succès !');
-                //redirige sur la page d'affichage de Sortie
+
                 return $this->redirectToRoute('main_home');
 
             } catch (Exception $exception) {

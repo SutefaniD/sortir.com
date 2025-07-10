@@ -21,21 +21,18 @@ class OutingLocationForm extends AbstractType
             ->add('outing', OutingTypeForm::class, [
                 'label' => false
             ])
-//            ->add('location', LocationForm::class, [
-//                'label' => false
-//            ])
-            ->add('location', EntityType::class, [
-                'class' => Location::class,
-                'choice_label' => 'name',
-                'placeholder' => 'Sélectionnez un lieu existant',
-                'required' => true,
-                'label' => 'Lieu',
-                'mapped' => true,
-                'attr' => [
-                    'data-action' => 'change->location#fetchDetails',
-                ]
+            ->add('chooseLocation', EntityType::class, [
+                "class" => Location::class,
+                "choice_label" => "name",
+                "placeholder" => "Choisir un lieu",
+                'mapped' => false,
             ])
-            ->add('save', SubmitType::class, [
+            ->add('newLocation', LocationForm::class, [
+                'label' => false,
+                'required' => false,
+            ])
+
+            ->add('create', SubmitType::class, [
                 'label' => 'Enregistrer',
                 'attr' => ['class' => 'btn btn-success']
             ])

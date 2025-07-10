@@ -37,56 +37,90 @@
 
 
             <div class="form-right">
-                <div class="form-row">
-                    {{ form_row(form.location.name) }}
+                <div class="form-row" id="select-location-div">
+                    {{ form_row(form.chooseLocation, {'attr': {'id': 'select-location'}}) }}
+                    <button type="button" id="add-location">+</button>
                 </div>
-{#                <div class="form-row">#}
-{#                    {{ form_row(form.location.street) }}#}
-{#                </div>#}
-{#                <div class="form-row">#}
-{#                    {{ form_row(form.location.zipCode) }}#}
-{#                </div>#}
-{#                <div class="form-row">#}
-{#                    {{ form_row(form.location.latitude) }}#}
-{#                </div>#}
-{#                <div class="form-row">#}
-{#                    {{ form_row(form.location.longitude) }}#}
-{#                </div>#}
+
+                <div id="location-details" style="display: none;">
+                    <div class="form-row">
+                        <label for="location_street">Rue :</label>
+                        <input type="text" id="location_street" placeholder="Rue" readonly>
+                    </div>
+                    <div class="form-row">
+                        <label for="location_city">Ville :</label>
+                        <input type="text" id="location_city" placeholder="Ville" readonly>
+                    </div>
+                    <div class="form-row">
+                        <label for="location_zipCode">Code Postal :</label>
+                        <input type="text" id="location_zipCode" placeholder="Code postal" readonly>
+                    </div>
+                    <div class="form-row">
+                        <label for="location_latitude">Latitude :</label>
+                        <input type="text" id="location_latitude" placeholder="Latitude">
+                    </div>
+                    <div class="form-row">
+                        <label for="location_longitude">Longitude :</label>
+                        <input type="text" id="location_longitude" placeholder="Longitude">
+                    </div>
+                </div>
+
+                <div class="form-row" id="new-location-form" style="display: none">
+{#                    {{ form_row(form.newLocation) }}#}
+                    {{ form_row(form.newLocation.name) }}
+                    {{ form_row(form.newLocation.street) }}
+                    {{ form_row(form.newLocation.city) }}
+                    {{ form_row(form.newLocation.zipCode) }}
+                    {{ form_row(form.newLocation.latitude) }}
+                    {{ form_row(form.newLocation.longitude) }}
+                </div>
             </div>
 
             <div class="form-buttons">
-                {{ form_row(form.save) }}
+                {{ form_row(form.create) }}
                 {{ form_row(form.publish) }}
                 <a href="{{ path('main_home') }}" class="btn btn-danger">Annuler</a>
             </div>
 
             {{ form_end(form, {'render_rest': false})  }}
 
-
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    const select = document.getElementById('location_select'); // adapte l'ID au champ réel
-                    if (!select) return;
-
-                    select.addEventListener('change', function() {
-                        const locationId = this.value;
-                        if (!locationId) return;
-
-                        fetch('/location/' + locationId + '/details')
-                            .then(response => response.json())
-                            .then(data => {
-                                // Remplir les champs du formulaire liés au lieu
-                                document.getElementById('location_name').value = data.name || '';
-                                document.getElementById('location_street').value = data.street || '';
-                                document.getElementById('location_postalCode').value = data.postalCode || '';
-                                document.getElementById('location_city').value = data.city || '';
-                                // etc.
-                            })
-                            .catch(error => console.error('Erreur AJAX:', error));
-                    });
-                });
-            </script>
-
         </section>
     </main>
+    <script>
+        document.querySelector('select[name="outing_location_form[chooseLocation]"]').addEventListener('change', function() {
+            const locationId = this.value;
+
+            if (locationId) {
+                fetch(`/location/${locationId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('location-details').style.display = 'block';
+
+                        document.getElementById('location_street').value = data.street;
+                        document.getElementById('location_city').value = data.city;
+                        document.getElementById('location_zipCode').value = data.postalCode;
+                        document.getElementById('location_latitude').value = data.latitude;
+                        document.getElementById('location_longitude').value = data.longitude;
+                    })
+                    .catch(error => console.error('Erreur : ', error));
+            } else {
+                document.getElementById('location-details').style.display = 'none';
+                // Réinitialise champs si aucun lieu sélectionné
+                document.getElementById('location_street').value = '';
+                document.getElementById('location_city').value = '';
+                document.getElementById('location_zipCode').value = '';
+                document.getElementById('location_latitude').value = '';
+                document.getElementById('location_longitude').value = '';
+            }
+        });
+
+        document.getElementById('add-location').addEventListener('click', function () {
+            document.getElementById('new-location-form').style.display = 'block';
+
+            const select = document.querySelector('select[name="outing_location_form[chooseLocation]"]');
+            select.value = '';
+
+            document.getElementById('location-details').style.display = 'none';
+        });
+    </script>
 {% endblock %}

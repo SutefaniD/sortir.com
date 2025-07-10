@@ -25,7 +25,6 @@ class OutingTypeForm extends AbstractType
             ->add('startingDateTime', DateTimeType::class, [
                 "label" => "Date et heure de la sortie : "
             ])
-
             ->add('registrationDeadline', DateType::class,[
                 "label" => "Date limite d'inscription : "
             ])
@@ -38,6 +37,8 @@ class OutingTypeForm extends AbstractType
             ->add('outingDetails', TextareaType::class, [
                 "label" => "Description et infos : "
             ]);
+
+
 
 //            ->add('location', EntityType::class, [
 //                'class' => Location::class,

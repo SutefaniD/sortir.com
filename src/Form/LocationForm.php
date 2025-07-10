@@ -19,62 +19,64 @@ class LocationForm extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $readonly = $options['readonly'] ?? false;
+
+        $attr = $readonly ? ['readonly' => true] : [];
+
         $builder
             // ->add('locationID', IntegerType::class, [
             //   'label' => 'ID du lieu'
             //])
             ->add('name', TextType::class, [
                 'label' => 'Nom du lieu',
-                'attr' => [
+                'attr' => array_merge([
                     'autofocus' => true,
-                    'id' => 'location_name'
-                ]
+                    'id' => 'location_name',
+                ], $attr)
             ])
             ->add('city', EntityType::class, [
                 'class' => City::class,
                 'choice_label' => 'name',
                 'label' => 'Ville',
-                'attr' => [
-                    'id' => 'city_name'
-                ]
+                'attr' => array_merge([
+                    'id' => 'location_city',
+                ], $attr)
             ])
             ->add('street', TextType::class, [
                 'label' => 'Rue',
-                'attr' => [
-                    'id' => 'location_street'
-                ]
+                'attr' => array_merge([
+                    'id' => 'location_street',
+                ], $attr)
             ])
             ->add('zipCode', TextType::class, [
-                'class' => City::class,
                 'label' => 'Code postal',
                 'mapped' => false,
                 'disabled' => false,
-                'attr' => [
-                    'id' => 'city_zip'
-                ]
+                'attr' => array_merge([
+                    'id' => 'location_zipCode',
+                ], $attr)
             ])
             ->add('latitude', TextType::class, [
                 'label' => 'Latitude',
                 'required' => false,
-                'attr' => [
-                    'id' => 'location_latitude'
-                ]
-
+                'attr' => array_merge([
+                    'id' => 'location_latitude',
+                ], $attr)
             ])
             ->add('longitude', TextType::class, [
                 'label' => 'Longitude',
                 'required' => false,
-                'attr' => [
-                    'id' => 'location_longitude'
-                ]
+                'attr' => array_merge([
+                    'id' => 'location_longitude',
+                ], $attr)
             ]);
-//            ->add('submit', SubmitType::class);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Location::class,
+            'readonly' => false,
         ]);
     }
 }

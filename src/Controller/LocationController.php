@@ -32,7 +32,7 @@ class LocationController extends AbstractController
         return $this->render('outing/create_location.html.twig', ['form' => $form]);
     }
 
-    #[Route('/location/{id}/details', name: 'location_details', methods: ['GET'])]
+    #[Route('/location/{id}', name: 'location_details', methods: ['GET'])]
     public function getLocationDetails(Location $location): JsonResponse
     {
         return $this->json([
