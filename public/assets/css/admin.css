@@ -35,3 +35,30 @@
     color: #222;
     font-size: 15px;
 }
+
+a.btn {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    margin-right: 0.5rem;
+    background-color: #007bff;
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+a.btn:hover {
+    background-color: #0056b3;
+}
+
+a.btn-danger {
+    background-color: #dc3545;
+}
+
+a.btn-danger:hover {
+    background-color: #b52a37;
+}

@@ -19,17 +19,17 @@ class ParticipantForm extends AbstractType
     {
         if ($options['include_profile']) {
             $builder
-                ->add('username', null, [
-                    'label' => 'Pseudo',
+                ->add('lastName', null, [
+                    'label' => 'Nom',
                     'attr' => [
                         'autofocus' => true,
-                        ]
+                    ]
                 ])
                 ->add('firstName', null, [
                     'label' => 'Prénom',
                 ])
-                ->add('lastName', null, [
-                    'label' => 'Nom',
+                ->add('username', null, [
+                    'label' => 'Pseudo',
                 ])
                 ->add('phone',null, [
                 'label' => 'Téléphone',

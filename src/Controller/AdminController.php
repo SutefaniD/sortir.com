@@ -15,6 +15,7 @@ use App\Repository\SiteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -47,7 +48,7 @@ final class AdminController extends AbstractController
 
             $headers = fgetcsv($handle);
 
-//            $created = 0;
+            $created = 0;
             while(($row = fgetcsv($handle)) !== false) {
                 $data = array_combine($headers, $row);
 
@@ -63,17 +64,18 @@ final class AdminController extends AbstractController
                 $site = $siteRepository->find($data['site_id'] ?? null);
                 $participant->setSite($site);
 
-                $participant->setAdministrator(false);
-                $participant->setActive(true);
+                $participant->setProfilePicture('assets/images/mood.svg');
+                $participant->setAdministrator($data['administrator'] ?? '');
+                $participant->setActive($data['active'] ?? '');
 
                 $entityManager->persist($participant);
-//                $created++;
+                $created++;
             }
 
             fclose($handle);
             $entityManager->flush();
 
-//            $this->addFlash('success', "$created utilisateurs importés avec succès !");
+            $this->addFlash('success', "$created utilisateurs importés avec succès !");
 
             return $this->redirectToRoute('admin_all_users');
         }

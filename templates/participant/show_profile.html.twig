@@ -9,7 +9,7 @@
         <div class="show-user-profile">
             {% if user.profilePicture %}
                 <div class="profile-picture">
-                    <img src="{{ user.profilePicture }}" alt="Photo de profil de {{ user.username }}">
+                    <img src="{{ asset(user.profilePicture) }}" alt="Photo de profil de {{ user.username }}">
                 </div>
             {% endif %}
             <div class="profile-details">
