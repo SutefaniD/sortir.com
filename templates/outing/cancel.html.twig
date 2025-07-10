@@ -1,14 +1,28 @@
 {% block main %}
 
-    <h2>Annuler une sortie</h2>
+    <!-- Détails de la sortie -->
+
+    <div style="max-width: 600px; margin: 0 auto;">
+        <h2>Annuler une sortie</h2>
+
+        <h3>{{ outing.name }}</h3>
+
+        <p>Date et heure de la sortie : {{ outing.startingDateTime|date('d/m/Y H:i') }} </p>
+
+        <p>Site : {{ outing.site.name }}</p>
+        <p>Nom du lieu : {{ outing.location.name }}</p>
+        <p>Rue : {{ outing.location.street }}</p>
+
+        <p>Ville : {{ outing.location.city.name }}</p>
+    </div>
 
     <div class="outing cancel-form">
 
         {{ form_start(form) }}
 
-
         <div style="max-width: 600px; margin: 0 auto;">
             <div class="mb-3">
+
                 {{ form_label(form.cancelReason) }}
                 {{ form_widget(form.cancelReason, {'attr': {'class': 'form-control', 'rows': 5}}) }}
             </div>
@@ -18,9 +32,7 @@
                 <a href="{{ path('outing_detail', {'id': outing.id}) }}" class="btn btn-secondary">Retour</a>
             </div>
         </div>
-
         {{ form_end(form) }}
-
     </div>
 
 {% endblock %}

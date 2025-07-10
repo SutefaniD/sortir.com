@@ -5,9 +5,9 @@
         {% if app.user.profilePicture %}
             <li><img src="{{ asset(app.user.profilePicture) }}" alt=""></li>
         {% endif %}
-        <li>Nom : {{ app.user.lastName }}</li>
-        <li>Prénom : {{ app.user.firstName }}</li>
         <li>Pseudo : {{ app.user.username }}</li>
+        <li>Prénom : {{ app.user.firstName }}</li>
+        <li>Nom : {{ app.user.lastName }}</li>
         <li>Téléphone : {{ app.user.phone }}</li>
         <li>Email : {{ app.user.email }}</li>
         <li>Site de rattachement : {{ app.user.site.name }}</li>
