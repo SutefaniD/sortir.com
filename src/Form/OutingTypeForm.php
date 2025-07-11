@@ -1,11 +1,7 @@
 <?php
 
 namespace App\Form;
-use App\Form\LocationForm;
 use App\Entity\Location;
-use App\Entity\Site;
-use App\Entity\Status;
-use App\Entity\Participant;
 use App\Entity\Outing;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -28,8 +24,8 @@ class OutingTypeForm extends AbstractType
             ->add('startingDateTime', DateTimeType::class, [
                 "label" => "Date et heure de la sortie : "
             ])
-            ->add('registrationDeadline', DateTimeType::class,[
-                "label" => "Date limite d'inscription: "
+            ->add('registrationDeadline', DateType::class,[
+                "label" => "Date limite d'inscription : "
             ])
             ->add('maxParticipants', IntegerType::class, [
                 "label" => "Nombre de places : "
@@ -38,7 +34,7 @@ class OutingTypeForm extends AbstractType
                 "label" => "Durée : "
             ])
             ->add('outingDetails', TextareaType::class, [
-                "label" => "Déscription et info : "
+                "label" => "Description et info : "
             ])
             ->add('location', EntityType::class, [
                 'class' => Location::class,
@@ -68,13 +64,14 @@ class OutingTypeForm extends AbstractType
                     'attr' => ['class' => 'btn btn-danger']
                 ]);
         }
+
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Outing::class,
-            'can_delete' => false, // valeur par défaut
+//            'can_delete' => false, // valeur par défaut
         ]);
     }
 }

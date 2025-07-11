@@ -61,7 +61,7 @@ class Outing
     private Collection $participants;
 
     #[ORM\ManyToOne(targetEntity: Participant::class, inversedBy: 'organizedOutings')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
     #[Assert\NotNull(message: "L'organisateur est requis.")]
     private ?Participant $organizer = null;
 

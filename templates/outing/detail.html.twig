@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 {% block title %}Afficher une sortie{% endblock %}
 
-{% block css %}<link rel="stylesheet" href="{{ asset('assets/css/out_detail.css') }}">{% endblock %}
+{% block css %}<link rel="stylesheet" href="{{ asset('css/out_detail.css') }}">{% endblock %}
 
 {% block main %}
     <div class="main-content">
@@ -19,11 +19,15 @@
         <p>Nom du lieu : {{ outing.location.name }}</p>
         <p>Rue : {{ outing.location.street }}</p>
         <p>Ville : {{ outing.location.city.name }}</p>
+    {#    <p>Code postal : {{ outing.location.zipCode }}</p>#}
+        {% if outing.location.latitude != null %}
+            <p>Latitude : {{ outing.location.latitude }}</p>
+        {% endif %}
+        {% if outing.location.longitude != null %}
+            <p>Longitude : {{ outing.location.longitude }}</p>
+        {% endif %}
+    {#  la partie concernante des inscrits#}
         <p>Code postal : {{ outing.location.city.zipCode }}</p>
-        <p>Latitude : {{ outing.location.latitude }}</p>
-        <p>Longitude : {{ outing.location.longitude }}</p>
-
-        {#  la partie concernante des inscrits#}
         <h2>Liste des participants inscrits :</h2>
         <table class="participants-table">
             <thead>

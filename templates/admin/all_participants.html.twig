@@ -6,7 +6,7 @@
 
 {% block main %}
     <div class="container">
-        <h2>Liste des participants</h2><a href="{{ path('admin_create_user') }}">Create participant</a><a href="{{ path('admin_import_users') }}">Importer des participants</a>
+        <h2>Liste des participants</h2><a href="{{ path('admin_create_user') }}" class="btn">Create participant</a><a href="{{ path('admin_import_users') }}" class="btn">Importer des participants</a>
         {% for participant in participants %}
             <div class="participant-row">
                 <div class="participant-field">
@@ -34,8 +34,8 @@
                     <span class="value">{{ participant.active ? 'true' : 'false' }}</span>
                 </div>
                 <div class="participant-field">
-                    <span><a href="{{ path('admin_disable_user', {'id': participant.id}) }}">{{ participant.active ? 'Désactiver' : 'Activer' }}</a></span>
-                    <span><a href="{{ path('admin_delete_user', {'id': participant.id}) }}">Supprimer</a></span>
+                    <span><a href="{{ path('admin_disable_user', {'id': participant.id}) }}" class="btn">{{ participant.active ? 'Désactiver' : 'Activer' }}</a></span>
+                    <span><a href="{{ path('admin_delete_user', {'id': participant.id}) }}" class="btn btn-danger">Supprimer</a></span>
                 </div>
             </div>
         {% endfor %}
