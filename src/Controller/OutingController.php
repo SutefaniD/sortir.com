@@ -201,6 +201,15 @@ final class OutingController extends AbstractController
         ]);
     }
 
+    #[Route('/archive/{id}', name: 'archive', requirements: ['id' => '\d+'],  methods: 'GET' )]
+    public function archive(Outing $outing, EntityManagerInterface $entityManager, StatusRepository $statusRepo): Response {
+        $outing->setStatus($statusRepo->findOneBy(['label' => 'Historisée']));
+        $entityManager->flush();
+
+        return $this->redirectToRoute('main_home');
+    }
+
+    //Suppression de Sortie
 
     //--------------------------------------- Suppression de Sortie ---------------------------------------
 

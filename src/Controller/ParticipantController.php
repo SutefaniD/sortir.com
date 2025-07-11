@@ -6,6 +6,7 @@ use App\Entity\Participant;
 use App\Form\ParticipantForm;
 use App\Repository\ParticipantRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -52,6 +53,8 @@ final class ParticipantController extends AbstractController
                     $profileImage->move($uploadsDir, $newFilename);
 
                     $participant->setProfilePicture('/uploads/profiles/' . $newFilename);
+                } else {
+                    $participant->setProfilePicture('assets/images/mood.svg');
                 }
 
                 $entityManager->persist($participant);
