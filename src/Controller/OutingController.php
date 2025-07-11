@@ -9,8 +9,6 @@ use App\Form\LocationForm;
 use App\Form\OutingTypeForm;
 use App\Repository\OutingRepository;
 use App\Repository\StatusRepository;
-use App\Service\OutingAuthorizationService;
-use App\Service\OutingStatusUpdater;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -69,12 +67,16 @@ final class OutingController extends AbstractController
             }
 
             try {
-                // Define status when button is clicked
-                if ($form->get('create')->isClicked()) {
-                    $outing->setStatus($statusRepo->findOneBy(['label' => 'Créée']));
-                } else if ($form->get('publish')->isClicked()) {
+                // Définir le statut selon le bouton cliqué
+                if ($form->get('publish')->isClicked()) {
                     $outing->setStatus($statusRepo->findOneBy(['label' => 'Ouverte']));
+                } else {
+                    $outing->setStatus($statusRepo->findOneBy(['label' => 'Créée']));
                 }
+//                    $outing->setstartingDateTime(new \DateTime());
+//                    $outing->setregistrationDeadline(new \DateTime());
+
+                //  $outing->setStatus($statusRepo->findOneBy(['label' => 'Ouverte']));
 
                 $entityManager->persist($outing);
                 $entityManager->flush();
@@ -82,9 +84,11 @@ final class OutingController extends AbstractController
                 $this->addFlash('success', 'Sortie créée avec succès !');
 
                 return $this->redirectToRoute('main_home');
+                //   return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
 
-            } catch (Exception $exception) {
-                $this->addFlash('warning', 'Erreur lors de la création : ' . $exception->getMessage());
+            }
+            catch (Exception $exception) {
+                $this->addFlash('warning', $exception->getMessage());
             }
         }
 
@@ -109,7 +113,6 @@ final class OutingController extends AbstractController
             'now' => new \DateTime()
         ]);
     }
-
 
     //----------------------------------Modification de Sortie--------------------------------------
 
@@ -209,7 +212,6 @@ final class OutingController extends AbstractController
         return $this->redirectToRoute('main_home');
     }
 
-    //Suppression de Sortie
 
     //--------------------------------------- Suppression de Sortie ---------------------------------------
 
@@ -282,7 +284,8 @@ final class OutingController extends AbstractController
             $em->flush();
             $this->addFlash('success', 'Inscription réussie !');
         }
-
+       
+//        return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);
         return $this->redirectToRoute('main_home');
     }
 
@@ -309,7 +312,6 @@ final class OutingController extends AbstractController
             // Update status
             $statusUpdater->updateStatus($outing);
             $this->addFlash('success', 'Désinscription effectuée');
-
         }
 
 //        return $this->redirectToRoute('outing_detail', ['id' => $outing->getId()]);

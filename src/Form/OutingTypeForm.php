@@ -4,7 +4,6 @@ namespace App\Form;
 use App\Entity\Location;
 use App\Entity\Outing;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -35,33 +34,36 @@ class OutingTypeForm extends AbstractType
                 "label" => "Durée : "
             ])
             ->add('outingDetails', TextareaType::class, [
-                "label" => "Description et infos : "
+                "label" => "Description et info : "
+            ])
+            ->add('location', EntityType::class, [
+                'class' => Location::class,
+                'choice_label'  => function ($location) {
+                    return $location->getName() . ', ' . $location->getStreet() . ' - ' . $location->getCity()->getName();
+                },
+                'label' => 'Lieux :'
+            ])
+
+
+            // ---------les boutons Enregistrer, Publier et Supprimer'
+
+            ->add('save', SubmitType::class, [
+                'label' => 'Enregistrer',
+                'attr' => ['class' => 'btn btn-success']
+            ])
+
+            ->add('publish', SubmitType::class, [
+                'label' => 'Publier la sortie',
+                'attr' => ['class' => 'btn btn-primary']
             ]);
-
-        // ---------les boutons Enregistrer, Publier et Supprimer'
-
-//            ->add('create', SubmitType::class, [
-//            'label' => 'Enregistrer',
-//            'attr' => ['class' => 'btn btn-success']
-//             ])
-//
-//            ->add('publish', SubmitType::class, [
-//                'label' => 'Publier la sortie',
-//                'attr' => ['class' => 'btn btn-primary']
-//            ])
-//            ->add('cancel', SubmitType::class, [
-//            'label' => 'Annuler',
-//            'attr' => ['class' => 'btn btn-primary']
-//            ]);
-
 // 👉 Ajouter le bouton "delete" uniquement si l’option `can_delete` est true
-//        if ($options['can_delete']) {
-//            $builder
-//                ->add('delete', SubmitType::class, [
-//                'label' => 'Supprimer la sortie',
-//                'attr' => ['class' => 'btn btn-danger']
-//            ]);
-//        }
+        if ($options['can_delete']) {
+            $builder
+                ->add('delete', SubmitType::class, [
+                    'label' => 'Supprimer la sortie',
+                    'attr' => ['class' => 'btn btn-danger']
+                ]);
+        }
 
     }
 
